@@ -103,10 +103,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		}
 		
 		echo '<tr>';
-		
-		//echo '<input type="hidden" name="action" value="add" />';
-		//	echo '<input type="hidden" name="id_charge" value="' . $charge_sociale->id . '"';
-		
+
 		echo '<td>' . $charge_sociale->getNomUrl(1,'20') . '</td>';
 		echo '<td>' . utf8_encode($obj->libelle) . '</td>';
 		echo '<td>' . utf8_encode($obj->type_lib) . '</td>'; // Type
