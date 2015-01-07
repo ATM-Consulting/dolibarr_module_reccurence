@@ -33,19 +33,25 @@ llxfooter();
 ?>
 
 <script>
-	$('.update-recurrence, .delete-recurrence').click(function() {
-		var type 		 = $(this).attr('class');
-		var id_charge 	 = $(this).data('chargesociale');
-		var periode		 = $('#periode_' + id_charge + ' option:selected').val();
-		var date_fin_rec = $('#date_fin_rec_' + id_charge).val();
-		var nb_prev_rec  = $('#nb_prev_rec_' + id_charge).val();
-		
-		$.ajax({
-			type: 'POST',
-			url: 'script/update-recurrence.php',
-			data: { type: type, id_charge: id_charge, periode: periode, date_fin_rec: date_fin_rec, nb_prev_rec: nb_prev_rec }
-		}).done(function(data) {
-			document.location.reload(true);
+	$(document).ready(function() {
+		$(".date").datepicker({
+			dateFormat: 'dd/mm/yy'
+		}).val();
+	
+		$('.update-recurrence, .delete-recurrence').click(function() {
+			var type 		 = $(this).attr('class');
+			var id_charge 	 = $(this).data('chargesociale');
+			var periode		 = $('#periode_' + id_charge + ' option:selected').val();
+			var date_fin_rec = $('#date_fin_rec_' + id_charge).datepicker().val();
+			var nb_prev_rec  = $('#nb_prev_rec_' + id_charge).val();
+			
+			$.ajax({
+				type: 'POST',
+				url: 'script/update-recurrence.php',
+				data: { type: type, id_charge: id_charge, periode: periode, date_fin_rec: date_fin_rec, nb_prev_rec: nb_prev_rec }
+			}).done(function(data) {
+				document.location.reload(true);
+			});
 		});
 	});
 </script>
@@ -88,6 +94,8 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	$param = '&action=' . $action;
 	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, 100);
 	
+	$form = new TFormCore($db);
+	
 	echo '<table class="noborder" width="100%">';
 	_print_head_tab_charges_sociales();
 
@@ -119,10 +127,10 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		
 		//echo '<td>' . $form_core->calendrier('', 'date_fin_rec', '') . '</td>';
 		if ($action == 'add') {
-			echo '<td><input type="text" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" /></td>';
+			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" /></td>';
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" /></td>';
 		} else {
-			echo '<td><input type="text" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" value="' . date('d/m/Y', $recurrence->date_fin) . '"/></td>';
+			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" value="' . date('d/m/Y', $recurrence->date_fin) . '"/></td>';
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" value="' . $recurrence->nb_previsionnel . '"/></td>';
 		}
 		

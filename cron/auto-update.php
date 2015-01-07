@@ -9,6 +9,7 @@ define('INC_FROM_CRON_SCRIPT', true);
 require_once '../config.php';
 require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/chargesociales.class.php';
 require_once DOL_DOCUMENT_ROOT . '/custom/recurrence/class/recurrence.class.php';
+dol_include_once("/cron/class/cronjob.class.php");
 
 global $db, $user;
 
@@ -86,8 +87,12 @@ function check(&$PDOdb) {
 		$current_date = new DateTime(date('Y-m-d'));
 		
 		$diff = $current_date->diff($last_date);
-
-		if (strtotime(date('Y-m-d', time())) < $recurrence->date_fin) {
+		
+		$date_fin_recurrence = strtotime($recurrence->date_fin);
+		
+		var_dump($date_fin_recurrence); exit;
+		if (strtotime(date('Y-m-d', time())) < $date_fin_recurrence) {
+			var_dump('yo');
 			switch ($recurrence->periode) {
 				case 'jour':
 					// Différence >= 1 jour
@@ -102,6 +107,9 @@ function check(&$PDOdb) {
 						while ($add--) {
 							$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'days'));
 							$date = strtotime($date);
+							
+							if ($date >= $date_fin_recurrence)
+								break;
 							
 							$id = create_charge_sociale($recurrence->fk_chargesociale, $date);
 							
@@ -122,6 +130,9 @@ function check(&$PDOdb) {
 							$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'week'));
 							$date = strtotime($date);
 							
+							if ($date >= $date_fin_recurrence)
+								break;
+							
 							$id = create_charge_sociale($recurrence->fk_chargesociale, $date);
 							
 							$counter++;
@@ -130,9 +141,9 @@ function check(&$PDOdb) {
 					break;
 				case 'mensuel':
 					// Différence >= 1 mois
-					var_dump(date('Y-m-d', $lastCharge->periode)); 
+					var_dump('yo'); exit;
 					if ($diff->m >= 1 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
-						//$id = create_charge_sociale($recurrence->fk_chargesociale, time());
+						$id = create_charge_sociale($recurrence->fk_chargesociale, time());
 					}
 	
 					if ($add > 0) {
@@ -141,6 +152,9 @@ function check(&$PDOdb) {
 						while ($add--) {
 							$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'month'));
 							$date = strtotime($date);
+							
+							if ($date >= $date_fin_recurrence)
+								break;
 	
 							$id = create_charge_sociale($recurrence->fk_chargesociale, $date);
 							
@@ -161,7 +175,10 @@ function check(&$PDOdb) {
 						while ($add--) {
 							$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . ($counter * 3) . 'month'));
 							$date = strtotime($date);
-						
+							
+							if ($date >= $date_fin_recurrence)
+								break;
+							
 							$id = create_charge_sociale($recurrence->fk_chargesociale, $date);
 							
 							$counter++;
@@ -170,17 +187,19 @@ function check(&$PDOdb) {
 					break;
 				case 'annuel':
 					// Différence >= 1 an
-					if ($diff->y >= 1 && $lastCharge->periode < time() && time() < $recurrence->date_fin) {
+					if ($diff->y >= 1 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
 						$id = create_charge_sociale($recurrence->fk_chargesociale, time());
 					}
 					
-					if ($recurrence->nb_previsionnel > 0) {
-						$i = $recurrence->nb_previsionnel;
+					if ($add > 0) {
 						$counter = 1;
 						
-						while ($i--) {
+						while ($add--) {
 							$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'year'));
 							$date = strtotime($date);
+							
+							if ($date >= $date_fin_recurrence)
+								break;
 							
 							$id = create_charge_sociale($recurrence->fk_chargesociale, $date);
 							
