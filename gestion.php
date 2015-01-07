@@ -68,6 +68,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		
 		WHERE cs.fk_type = c.id
 		AND cs.entity = "  . $conf->entity . "
+		AND cs.rowid NOT IN (SELECT fk_target FROM " . MAIN_DB_PREFIX . "element_element WHERE sourcetype = 'chargesociales' AND targettype = 'chargesociales')
 	";
 	
 	if ($action == 'add')
@@ -109,6 +110,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		echo '<td>' . $charge_sociale->getNomUrl(1,'20') . '</td>';
 		echo '<td>' . utf8_encode($obj->libelle) . '</td>';
 		echo '<td>' . utf8_encode($obj->type_lib) . '</td>'; // Type
+		echo '<td>' . dol_print_date($obj->periode, 'day') . '</td>';
 		echo '<td>' . price($obj->amount, 2) . '</td>';
 		
 		echo '<td>';
@@ -148,6 +150,7 @@ function _print_head_tab_charges_sociales() {
 		print_liste_field_titre('Ref', $_SERVER['PHP_SELF'], 'id');
 		print_liste_field_titre('Libellé', $_SERVER['PHP_SELF'], 'libelle');
 		print_liste_field_titre('Type', $_SERVER['PHP_SELF'], 'type_lib');
+		print_liste_field_titre('Date', $_SERVER['PHP_SELF'], 'periode');
 		print_liste_field_titre('Montant', $_SERVER['PHP_SELF'], 'amount');
 		print_liste_field_titre('Récurrence', $_SERVER['PHP_SELF'], 'fk_recurrence');
 		print_liste_field_titre('Date de fin', $_SERVER['PHP_SELF'], 'fk_recurrence');
