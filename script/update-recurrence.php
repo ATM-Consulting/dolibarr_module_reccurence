@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * 
+ * Pour appel ajax
+ */
+
 require_once '../config.php';
 require_once '../class/recurrence.class.php';
 

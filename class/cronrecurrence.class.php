@@ -121,7 +121,7 @@ class TCronRecurrence {
 							$counter = 1;
 							
 							while ($add--) {
-								$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'week'));
+								$date = date('Y-m-d', strtotime('+' . $counter . 'week'));
 								$date = strtotime($date);
 								
 								if ($date >= $date_fin_recurrence)
