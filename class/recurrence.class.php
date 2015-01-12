@@ -32,10 +32,11 @@ class TRecurrence extends TObjetStd {
 		echo '<select id="' . $id . '" name="' . $name . '">';
 	
 		foreach (self::$TPeriodes as $key => $periode) {
-			if ($default == $key)
+			if ($default == $key) {
 				echo '<option value="' . $key . '" selected="selected">' . $periode . '</option>';
-			else
+			} else {
 				echo '<option value="' . $key . '">' . $periode . '</option>';
+			}
 		}
 			
 		
@@ -60,12 +61,17 @@ class TRecurrence extends TObjetStd {
 		$recurrence->nb_previsionnel  = $nb_previsionnel;
 		
 		$date = explode('/', $date_fin_rec);
-		$recurrence->date_fin = dol_mktime(0, 0, 0, $date[1], $date[0], $date[2]);
+		if (!empty($date_fin_rec)) {
+			$recurrence->date_fin = dol_mktime(0, 0, 0, $date[1], $date[0], $date[2]);
+		}
 
 		$recurrence->save($PDOdb);
 	
 		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . TRecurrence::$TPeriodes[$periode] . ')';
 		setEventMessage($message);
+		
+		$task = new TCronRecurrence($PDOdb);
+		$task->run();
 		
 		return true;
 	}

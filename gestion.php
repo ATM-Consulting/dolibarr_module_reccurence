@@ -120,7 +120,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		
 		echo '<td>';
 		if ($action == 'add')
-			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode');
+			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', 'mensuel');
 		else
 			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', $recurrence->periode);
 		echo '</td>';

@@ -25,8 +25,8 @@
  *  \ingroup    recurrence
  *  \brief      Description and activation file for module Recurrence
  */
-include_once DOL_DOCUMENT_ROOT .'/core/modules/DolibarrModules.class.php';
-
+include_once DOL_DOCUMENT_ROOT . '/core/modules/DolibarrModules.class.php';
+include_once DOL_DOCUMENT_ROOT . '/cron/class/cronjob.class.php';
 
 /**
  *  Description and activation class for module Recurrence
@@ -40,7 +40,7 @@ class modRecurrence extends DolibarrModules
 	 */
 	function __construct($db)
 	{
-        global $langs,$conf;
+        global $langs, $conf, $user;
 
         $this->db = $db;
 
@@ -98,7 +98,7 @@ class modRecurrence extends DolibarrModules
 
 		// Dependencies
 		$this->hidden = false;			// A condition to hide module
-		$this->depends = array();		// List of modules id that must be enabled if this module is enabled
+		$this->depends = array('modTax', 'modCron');		// List of modules id that must be enabled if this module is enabled
 		$this->requiredby = array();	// List of modules id to disable if this one is disabled
 		$this->conflictwith = array();	// List of modules id this module is in conflict with
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
@@ -112,54 +112,15 @@ class modRecurrence extends DolibarrModules
 		// );
 		$this->const = array();
 
-		// Array to add new pages in new tabs
-		// Example: $this->tabs = array('objecttype:+tabname1:Title1:mylangfile@recurrence:$user->rights->recurrence->read:/recurrence/mynewtab1.php?id=__ID__',  	// To add a new tab identified by code tabname1
-        //                              'objecttype:+tabname2:Title2:mylangfile@recurrence:$user->rights->othermodule->read:/recurrence/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2
-        //                              'objecttype:-tabname:NU:conditiontoremove');                                                     						// To remove an existing tab identified by code tabname
-		// where objecttype can be
-		// 'categories_x'	  to add a tab in category view (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
-		// 'contact'          to add a tab in contact view
-		// 'contract'         to add a tab in contract view
-		// 'group'            to add a tab in group view
-		// 'intervention'     to add a tab in intervention view
-		// 'invoice'          to add a tab in customer invoice view
-		// 'invoice_supplier' to add a tab in supplier invoice view
-		// 'member'           to add a tab in fundation member view
-		// 'opensurveypoll'	  to add a tab in opensurvey poll view
-		// 'order'            to add a tab in customer order view
-		// 'order_supplier'   to add a tab in supplier order view
-		// 'payment'		  to add a tab in payment view
-		// 'payment_supplier' to add a tab in supplier payment view
-		// 'product'          to add a tab in product view
-		// 'propal'           to add a tab in propal view
-		// 'project'          to add a tab in project view
-		// 'stock'            to add a tab in stock view
-		// 'thirdparty'       to add a tab in third party view
-		// 'user'             to add a tab in user view
         $this->tabs = array();
 
         // Dictionaries
-	    if (! isset($conf->recurrence->enabled))
+	    if (!isset($conf->recurrence->enabled))
         {
         	$conf->recurrence=new stdClass();
         	$conf->recurrence->enabled=0;
         }
 		$this->dictionaries=array();
-        /* Example:
-        if (! isset($conf->recurrence->enabled)) $conf->recurrence->enabled=0;	// This is to avoid warnings
-        $this->dictionaries=array(
-            'langs'=>'mylangfile@recurrence',
-            'tabname'=>array(MAIN_DB_PREFIX."table1",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
-            'tablib'=>array("Table1","Table2","Table3"),													// Label of tables
-            'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table1 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table2 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table3 as f'),	// Request to select fields
-            'tabsqlsort'=>array("label ASC","label ASC","label ASC"),																					// Sort order
-            'tabfield'=>array("code,label","code,label","code,label"),																					// List of fields (result of select to show dictionary)
-            'tabfieldvalue'=>array("code,label","code,label","code,label"),																				// List of fields (list of fields to edit a record)
-            'tabfieldinsert'=>array("code,label","code,label","code,label"),																			// List of fields (list of fields for insert)
-            'tabrowid'=>array("rowid","rowid","rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
-            'tabcond'=>array($conf->recurrence->enabled,$conf->recurrence->enabled,$conf->recurrence->enabled)												// Condition to show each dictionary
-        );
-        */
 
         // Boxes
 		// Add here list of php file(s) stored in core/boxes that contains class to show a box.
@@ -170,16 +131,6 @@ class modRecurrence extends DolibarrModules
 		// Permissions
 		$this->rights = array();		// Permission array used by this module
 		$r=0;
-
-		// Add here list of permission defined by an id, a label, a boolean and two constant strings.
-		// Example:
-		// $this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
-		// $this->rights[$r][1] = 'Permision label';	// Permission label
-		// $this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
-		// $this->rights[$r][4] = 'level1';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		// $this->rights[$r][5] = 'level2';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		// $r++;
-
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
@@ -215,11 +166,48 @@ class modRecurrence extends DolibarrModules
 	 */
 	function init($options='')
 	{
+		global $user;
+		
 		$sql = array();
 
 		$url = dol_buildpath('/recurrence/script/create-maj-base.php', 2);
 		file_get_contents($url);
-		 
+		
+		$TValues = array(
+			'label' => 'Mise à jour récurrence',
+			'jobtype' => 'method',
+			'frequency' => 86400,
+			'unitfrequency' => 86400,
+			'status' => 1,
+			'module_name' => 'recurrence',
+			'classesname' => 'cronrecurrence.class.php',
+			'objectname' => 'TCronRecurrence',
+			'methodename' => 'run',
+			'params' => '',
+			'datestart' => time()
+		);
+		
+		$req = "
+			SELECT rowid
+			FROM " . MAIN_DB_PREFIX . "cronjob
+			WHERE classesname = '" . $TValues['classesname'] . "'
+			AND module_name = '" . $TValues['module_name'] . "'
+			AND objectname = '" . $TValues['objectname'] . "'
+			AND methodename = '" . $TValues['methodename'] . "'
+		";
+		
+		$res = $this->db->query($req);
+		$job = $this->db->fetch_object($res);
+		
+		if (empty($job->rowid)) {
+			$cronTask = new Cronjob($this->db);
+			foreach ($TValues as $key => $value) {
+				$cronTask->{$key} = $value;
+			}
+			
+			$cronTask->create($user);
+		}
+		
 		return $this->_init($sql, $options);
 	}
 
