@@ -97,7 +97,7 @@ class TCronRecurrence {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
-								$date = date('Y-m-d', strtotime('+' . $counter . 'days'));
+								$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $counter . 'days'));
 								$date = strtotime($date);
 								
 								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
@@ -119,7 +119,7 @@ class TCronRecurrence {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
-								$date = date('Y-m-d', strtotime('+' . $counter . 'week'));
+								$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $counter . 'week'));
 								$date = strtotime($date);
 								
 								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
@@ -141,7 +141,7 @@ class TCronRecurrence {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
-								$date = date('Y-m-d', strtotime('+' . $counter . 'month'));
+								$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $counter . 'month'));
 								$date = strtotime($date);
 								
 								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
@@ -186,7 +186,7 @@ class TCronRecurrence {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
-								$date = date('Y-m-d', strtotime('+' . $counter . 'year'));
+								$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $counter . 'year'));
 								$date = strtotime($date);
 								
 								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
