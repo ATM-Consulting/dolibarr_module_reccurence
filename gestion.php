@@ -35,7 +35,8 @@ llxfooter();
 <script>
 	$(document).ready(function() {
 		$(".date").datepicker({
-			dateFormat: 'dd/mm/yy'
+			dateFormat: 'dd/mm/yy',
+			defaultDate: null
 		}).val();
 	
 		$('.update-recurrence, .delete-recurrence').click(function() {
@@ -130,7 +131,12 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" /></td>';
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" /></td>';
 		} else {
-			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" value="' . date('d/m/Y', $recurrence->date_fin) . '"/></td>';
+			$date = '';
+			
+			if ($recurrence->date_fin > 0)
+				$date = date('d/m/Y', $recurrence->date_fin);
+			
+			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" value="' . $date . '"/></td>';
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" value="' . $recurrence->nb_previsionnel . '"/></td>';
 		}
 		

@@ -8,8 +8,7 @@ class TCronRecurrence {
 		$this->db = $db;
 	}
 	
-	// Test module CRON Dolibarr
-	function run() {		
+	function run() {	
 		// Récupération de la liste des charges récurrentes
 		$sql = "
 			SELECT rowid, fk_chargesociale, periode, nb_previsionnel, date_fin
@@ -46,7 +45,6 @@ class TCronRecurrence {
 				$lastCharge->fetch($recurrence->fk_chargesociale);
 			} else {
 				// On récupére les infos de la précédente charge sociale créée
-				//$last = $TLastCharge[0];
 				$lastCharge = new ChargeSociales($this->db);
 				$lastCharge->fetch($last->fk_target);
 			}
@@ -69,10 +67,10 @@ class TCronRecurrence {
 			}
 			
 			// Récurrences à ajouter pour correspondre au nombre previsionnel
-			$add = $recurrence->nb_previsionnel - count($TCharges);
+			$nb_ajouts = $recurrence->nb_previsionnel - count($TCharges);
 					
-			if ($add < 0)
-				$add = 0;
+			if ($nb_ajouts < 0)
+				$nb_ajouts = 0;
 			
 			if (empty($lastCharge->id)) {
 				$lastCharge = new ChargeSociales($this->db);
@@ -86,23 +84,23 @@ class TCronRecurrence {
 			
 			$date_fin_recurrence = strtotime($recurrence->date_fin);
 			
-			if (strtotime(date('Y-m-d', time())) < $date_fin_recurrence) {
+			if ($date_fin_recurrence < 0 || strtotime('now') < $date_fin_recurrence) {
 				switch ($recurrence->periode) {
 					case 'jour':
 						// Différence >= 1 jour
-						if ($diff->days >= 1 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
+						if ($diff->days >= 1 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 						
 						// Création des charges sociales supplémentaires selon nombre prévisionnel
-						if ($add > 0) {
+						if ($nb_ajouts > 0) {
 							$counter = 1;
 							
-							while ($add--) {
-								$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'days'));
+							while ($nb_ajouts--) {
+								$date = date('Y-m-d', strtotime('+' . $counter . 'days'));
 								$date = strtotime($date);
 								
-								if ($date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -113,18 +111,18 @@ class TCronRecurrence {
 						break;
 					case 'hebdo':
 						// Différence >= 7 jours
-						if ($diff->days >= 7 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
+						if ($diff->days >= 7 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 						
-						if ($add > 0) {
+						if ($nb_ajouts > 0) {
 							$counter = 1;
 							
-							while ($add--) {
+							while ($nb_ajouts--) {
 								$date = date('Y-m-d', strtotime('+' . $counter . 'week'));
 								$date = strtotime($date);
 								
-								if ($date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -135,18 +133,18 @@ class TCronRecurrence {
 						break;
 					case 'mensuel':
 						// Différence >= 1 mois
-						if ($diff->m >= 1 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
+						if ($diff->m >= 1 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 		
-						if ($add > 0) {
+						if ($nb_ajouts > 0) {
 							$counter = 1;
 							
-							while ($add--) {
-								$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'month'));
+							while ($nb_ajouts--) {
+								$date = date('Y-m-d', strtotime('+' . $counter . 'month'));
 								$date = strtotime($date);
 								
-								if ($date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
 									break;
 		
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -157,19 +155,19 @@ class TCronRecurrence {
 						break;
 					case 'trim':
 						// Différence >= 3 mois
-						if ($diff->m >= 3 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
+						if ($diff->m >= 3 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 					
-						if ($add > 0) {
+						if ($nb_ajouts > 0) {
 							$counter = 1;
-							var_dump($add);
+							var_dump($nb_ajouts);
 							
-							while ($add--) {
+							while ($nb_ajouts--) {
 								$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . ($counter * 3) . 'month'));
 								$date = strtotime($date);
 								
-								if ($date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -180,18 +178,18 @@ class TCronRecurrence {
 						break;
 					case 'annuel':
 						// Différence >= 1 an
-						if ($diff->y >= 1 && $lastCharge->periode < strtotime(date('Y-m-d', time()))) {
+						if ($diff->y >= 1 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 						
-						if ($add > 0) {
+						if ($nb_ajouts > 0) {
 							$counter = 1;
 							
-							while ($add--) {
-								$date = date('Y-m-d', strtotime(date('Y-m-d') . '+' . $counter . 'year'));
+							while ($nb_ajouts--) {
+								$date = date('Y-m-d', strtotime('+' . $counter . 'year'));
 								$date = strtotime($date);
 								
-								if ($date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -229,9 +227,7 @@ class TCronRecurrence {
 			$id = $chargesociale->create($user);
 					
 			$chargesociale->add_object_linked('chargesociales', $id_source);
-			
-			print 'CREATION : Charge Sociale (ID = ' . $id . ')<br />';
-			
+						
 			return $id;
 		}
 	}

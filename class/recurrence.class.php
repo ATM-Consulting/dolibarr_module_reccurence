@@ -1,5 +1,6 @@
 <?php
-require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/chargesociales.class.php';
+require_once DOL_DOCUMENT_ROOT . '/compta/sociales/class/chargesociales.class.php';
+require_once DOL_DOCUMENT_ROOT . '/custom/recurrence/class/cronrecurrence.class.php';
 
 class TRecurrence extends TObjetStd {
 	public static $TPeriodes = array(
@@ -19,7 +20,6 @@ class TRecurrence extends TObjetStd {
 		parent::add_champs('periode', array('type' => 'text'));
 		parent::add_champs('nb_previsionnel', array('type' => 'entier'));
 		parent::add_champs('date_fin', array('type' => 'date'));
-		parent::add_champs('derniere_application', array('type' => 'date'));
 		
 		parent::_init_vars();
 		parent::start();
@@ -47,6 +47,7 @@ class TRecurrence extends TObjetStd {
 	 * Fonction permettant d'ajouter ou modifier une récurrence selon si elle existe ou non
 	 */
 	static function update(&$PDOdb, $id_charge, $periode, $date_fin_rec, $nb_previsionnel) {
+		global $db;
 		
 		if (!empty($date_fin_rec) && !preg_match('/([0-9]{2}[\/-]?){2}([0-9]{4})/', $date_fin_rec))
 			return false;
@@ -60,9 +61,11 @@ class TRecurrence extends TObjetStd {
 		$recurrence->periode 		  = $periode;
 		$recurrence->nb_previsionnel  = $nb_previsionnel;
 		
-		$date = explode('/', $date_fin_rec);
 		if (!empty($date_fin_rec)) {
+			$date = explode('/', $date_fin_rec);
 			$recurrence->date_fin = dol_mktime(0, 0, 0, $date[1], $date[0], $date[2]);
+		} else {
+			$recurrence->date_fin = null;
 		}
 
 		$recurrence->save($PDOdb);
@@ -70,7 +73,7 @@ class TRecurrence extends TObjetStd {
 		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . TRecurrence::$TPeriodes[$periode] . ')';
 		setEventMessage($message);
 		
-		$task = new TCronRecurrence($PDOdb);
+		$task = new TCronRecurrence($db);
 		$task->run();
 		
 		return true;
