@@ -141,7 +141,23 @@ class TCronRecurrence {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
-								$date = date('Y-m-d', strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $counter . 'month'));
+								$date_charge = date('Y-m-d', $lastCharge->periode);
+								$date = date('Y-m-d', strtotime($date_charge . '+' . $counter . 'month'));
+								
+								// S'il s'agit du mois de Février...
+								if ((date('m', $lastCharge->periode) + $counter) % 12 == 2) {
+									$details = explode('-', $date);
+									$year = $details[0];
+									
+									$month = date('m', $lastCharge->periode);
+									$day = date('d', $lastCharge->periode);
+									
+									$last_day_of_month = date('t', strtotime($year . '-02-01'));
+									
+									if ($day > $last_day_of_month)
+										$date = date('Y-02-' . $last_day_of_month);
+								}
+			
 								$date = strtotime($date);
 								
 								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
