@@ -29,6 +29,18 @@ print dol_get_fiche_head(array(
 
 _liste_charges_sociales($PDOdb, $action, $page, $limit, $offset);
 
+if ($action == 'add') {
+	echo '<a href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
+		<button class="butAction" style="float: right;">Ajouter une charge sociale</button>
+	</a>';
+} else {
+	echo '<a href="gestion.php?action=add">
+		<button class="butAction" style="float: right;">Ajouter une récurrence</button>
+	</a>';
+}
+
+echo '<div style="clear: both;"></div>';
+
 llxfooter();
 ?>
 
@@ -126,7 +138,6 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', $recurrence->periode);
 		echo '</td>';
 		
-		//echo '<td>' . $form_core->calendrier('', 'date_fin_rec', '') . '</td>';
 		if ($action == 'add') {
 			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" /></td>';
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" /></td>';
@@ -151,6 +162,13 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 				
 		echo '</tr>';	
 	}
+
+	if (count($result) <= 0) {
+		echo '<tr>';
+		echo '<td style="text-align: center;" colspan="9">Aucune récurrence enregistrée. (<a href="gestion.php?action=add">Créer une récurrence</a>)</td>';
+		echo '</tr>';	
+	}
+	
 	echo '</tbody>';
 	echo '</table>';
 }
