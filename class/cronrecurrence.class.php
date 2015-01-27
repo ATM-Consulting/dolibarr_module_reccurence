@@ -56,6 +56,7 @@ class TCronRecurrence {
 				INNER JOIN " . MAIN_DB_PREFIX . "element_element as e ON e.fk_target = c.rowid
 				WHERE e.fk_source = " . $recurrence->fk_chargesociale . "
 				AND e.sourcetype = 'chargesociales'
+				AND e.targettype = 'chargesociales'
 				AND c.periode > CURDATE()
 			";
 			
@@ -93,7 +94,7 @@ class TCronRecurrence {
 						}
 						
 						// Création des charges sociales supplémentaires selon nombre prévisionnel
-						if ($nb_ajouts > 0) {
+						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
@@ -115,7 +116,7 @@ class TCronRecurrence {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 						
-						if ($nb_ajouts > 0) {
+						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
@@ -137,7 +138,7 @@ class TCronRecurrence {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 		
-						if ($nb_ajouts > 0) {
+						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
@@ -175,7 +176,7 @@ class TCronRecurrence {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 					
-						if ($nb_ajouts > 0) {
+						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
 							$counter = 1;
 							var_dump($nb_ajouts);
 							
@@ -198,7 +199,7 @@ class TCronRecurrence {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
 						}
 						
-						if ($nb_ajouts > 0) {
+						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
