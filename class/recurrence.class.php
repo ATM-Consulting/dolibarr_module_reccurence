@@ -62,7 +62,7 @@ class TRecurrence extends TObjetStd {
 		$recurrence->nb_previsionnel  = $nb_previsionnel;
 		
 		if (!empty($date_fin_rec)) {
-			$date = explode('/', $date_fin_rec);
+			$date = explode('/', $date_fin_rec); // $recurrence->date_fin je dirais que c'est déjà init
 			$recurrence->date_fin = dol_mktime(0, 0, 0, $date[1], $date[0], $date[2]);
 		} else {
 			$recurrence->date_fin = null;

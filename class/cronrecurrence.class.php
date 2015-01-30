@@ -91,6 +91,9 @@ class TCronRecurrence {
 						// Différence >= 1 jour
 						if ($diff->days >= 1 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
+							 $lastCharge->fetch($id);
+                                                        $nb_ajouts--;
+
 						}
 						
 						// Création des charges sociales supplémentaires selon nombre prévisionnel
@@ -114,6 +117,9 @@ class TCronRecurrence {
 						// Différence >= 7 jours
 						if ($diff->days >= 7 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
+							 $lastCharge->fetch($id);
+                                                        $nb_ajouts--;
+
 						}
 						
 						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
@@ -136,16 +142,20 @@ class TCronRecurrence {
 						// Différence >= 1 mois
 						if ($diff->m >= 1 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
+							$lastCharge->fetch($id);
+							$nb_ajouts--;
 						}
 		
 						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
 							$counter = 1;
 							
 							while ($nb_ajouts--) {
+
 								$date_charge = date('Y-m-d', $lastCharge->periode);
 								$date = date('Y-m-d', strtotime($date_charge . '+' . $counter . 'month'));
 								
 								// S'il s'agit du mois de Février...
+								//TODO c'est de la merde
 								if ((date('m', $lastCharge->periode) + $counter) % 12 == 2) {
 									$details = explode('-', $date);
 									$year = $details[0];
@@ -174,6 +184,9 @@ class TCronRecurrence {
 						// Différence >= 3 mois
 						if ($diff->m >= 3 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
+							$lastCharge->fetch($id);
+                                                        $nb_ajouts--;
+
 						}
 					
 						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
@@ -197,6 +210,9 @@ class TCronRecurrence {
 						// Différence >= 1 an
 						if ($diff->y >= 1 && $lastCharge->periode < strtotime('now')) {
 							$id = $this->create_charge_sociale($recurrence->fk_chargesociale, time());
+							 $lastCharge->fetch($id);
+                                                        $nb_ajouts--;
+
 						}
 						
 						if ($nb_ajouts >= $recurrence->nb_previsionnel) {
