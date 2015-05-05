@@ -167,11 +167,6 @@ class TCronRecurrence {
 
 								$date = strtotime($date);
 								
-								if ($recurrence->fk_chargesociale == 474) {
-									$message = 'Date : ' . $lastCharge->periode . ' - Timestamp date : ' . $date . ' - Timestamp date_fin_recurrence : ' . $date_fin_recurrence;
-									setEventMessage($message);
-								}
-								
 								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
 									break;
 
