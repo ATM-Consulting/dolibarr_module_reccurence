@@ -30,9 +30,11 @@ print dol_get_fiche_head(array(
 _liste_charges_sociales($PDOdb, $action, $page, $limit, $offset);
 
 if ($action == 'add') {
-	echo '<a href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
-		<button class="butAction" style="float: right;">Ajouter une charge sociale</button>
-	</a>';
+	if ($user->rights->tax->charges->creer) {
+		echo '<a href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
+			<button class="butAction" style="float: right;">Ajouter une charge sociale</button>
+		</a>';
+	}
 } else {
 	echo '<a href="gestion.php?action=add">
 		<button class="butAction" style="float: right;">Ajouter une récurrence</button>
@@ -75,7 +77,7 @@ llxfooter();
  * Liste des charges sociales
  */
 function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
-	global $conf, $db;
+	global $conf, $db, $user;
 	
 	$charge_sociale = new ChargeSociales($PDOdb);
 	
@@ -150,14 +152,18 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			echo '<td><input type="text" class="date" id="date_fin_rec_' . $obj->id . '" name="date_fin_rec" value="' . $date . '"/></td>';
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" value="' . $recurrence->nb_previsionnel . '"/></td>';
 		}
-		
-		if ($action == 'add') {
-			echo '<td><button class="update-recurrence" data-chargesociale="' . $obj->id . '">Ajouter</button></td>';
+
+		if ($user->rights->tax->charges->creer) {
+			if ($action == 'add') {
+				echo '<td><button class="update-recurrence" data-chargesociale="' . $obj->id . '">Ajouter</button></td>';
+			} else {
+				echo '<td>
+					<button class="update-recurrence" data-chargesociale="' . $obj->id . '">Modifier</button>
+					<button class="delete-recurrence" data-chargesociale="' . $obj->id . '">Supprimer</button>
+				</td>';
+			}
 		} else {
-			echo '<td>
-				<button class="update-recurrence" data-chargesociale="' . $obj->id . '">Modifier</button>
-				<button class="delete-recurrence" data-chargesociale="' . $obj->id . '">Supprimer</button>
-			</td>';
+			echo '<td>Droits requis</td>';
 		}
 				
 		echo '</tr>';	

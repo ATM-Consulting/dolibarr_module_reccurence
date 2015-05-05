@@ -107,7 +107,7 @@ class TCronRecurrence {
 								// A partir de la dernière charge créée, on prend date + 1, date + 2, ..., date + n
 								$date = strtotime(date('Y-m-d', $lastCharge->periode) . ' +' . $nb_jours . 'days');
 								
-								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date > $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -130,7 +130,7 @@ class TCronRecurrence {
 							while ($nb_ajouts > 0) {
 								$date = strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $nb_semaines . 'week');
 								
-								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date > $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -167,7 +167,7 @@ class TCronRecurrence {
 
 								$date = strtotime($date);
 								
-								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date > $date_fin_recurrence)
 									break;
 
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -188,9 +188,9 @@ class TCronRecurrence {
 							$nb_trimestres = 1;
 							
 							while ($nb_ajouts > 0) {
-								$date = strtotime(date('Y-m-d', $lastCharge->periode) . '+' . ($nb_trimestres * 3) . 'month');
+								$date = strtotime(date('Y-m-d', $lastCharge->periode) . '+' . ($nb_trimestres * 3) . 'month');							
 								
-								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date > $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
@@ -212,7 +212,7 @@ class TCronRecurrence {
 							while ($nb_ajouts > 0) {
 								$date = strtotime(date('Y-m-d', $lastCharge->periode) . '+' . $nb_annees . 'year');
 								
-								if ($date_fin_recurrence > 0 && $date >= $date_fin_recurrence)
+								if ($date_fin_recurrence > 0 && $date > $date_fin_recurrence)
 									break;
 								
 								$id = $this->create_charge_sociale($recurrence->fk_chargesociale, $date);
