@@ -54,7 +54,7 @@ class TRecurrence extends TObjetStd {
 
 		if ($nb_previsionnel < 0)
 			return false;
-	
+		
 		$recurrence = self::get_recurrence($PDOdb, $id_charge);
 
 		$recurrence->fk_chargesociale = $id_charge;
@@ -69,7 +69,7 @@ class TRecurrence extends TObjetStd {
 		}
 
 		$recurrence->save($PDOdb);
-	
+		
 		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . TRecurrence::$TPeriodes[$periode] . ')';
 		setEventMessage($message);
 		

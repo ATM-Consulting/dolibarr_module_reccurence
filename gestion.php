@@ -105,7 +105,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	$num = count($result);
 	
 	$param = '&action=' . $action;
-	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, 100);
+	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $limit + 1);
 	
 	$form = new TFormCore($db);
 	
