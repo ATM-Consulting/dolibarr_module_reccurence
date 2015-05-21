@@ -158,8 +158,11 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 				echo '<td><button class="update-recurrence" data-chargesociale="' . $obj->id . '">Ajouter</button></td>';
 			} else {
 				echo '<td>
-					<button class="update-recurrence" data-chargesociale="' . $obj->id . '">Modifier</button>
-					<button class="delete-recurrence" data-chargesociale="' . $obj->id . '">Supprimer</button>
+					<a href="paiement.php?id=' . $obj->id . '">
+						<button class="pay-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Payer</button>
+					</a>
+					<button class="update-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Modifier</button>
+					<button class="delete-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Supprimer</button>
 				</td>';
 			}
 		} else {
