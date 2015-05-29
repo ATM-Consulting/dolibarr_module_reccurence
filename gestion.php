@@ -15,6 +15,10 @@ if ($page < 0) $page = 0;
 $limit  = $conf->liste_limit;
 $offset = $limit * $page;
 
+if (!$user->rights->tax->charges->lire) {
+	accessforbidden();	
+}
+
 /*
  * HEADER
  */ 
@@ -31,21 +35,23 @@ echo '<form method="POST" action="paiement.php">'; // Formulaire pour la gestion
 
 _liste_charges_sociales($PDOdb, $action, $page, $limit, $offset);
 
-if ($action == 'add') {
-	if ($user->rights->tax->charges->creer) {
-		echo '<a href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
-			<button class="butAction" style="float: right;">Ajouter une charge sociale</button>
-		</a>';
+if ($user->rights->tax->charges->creer) {
+	if ($action == 'add') {
+		if ($user->rights->tax->charges->creer) {
+			echo '<a href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
+				<button class="butAction" style="float: right;">Ajouter une charge sociale</button>
+			</a>';
+		}
+	} else {
+		echo '<div class="tabsAction">';
+			echo '
+			<div class="inline-block divButAction">
+				<input type="submit" class="butAction" value="Payer les récurrences sélectionnées" />
+			</div>';
+			
+			echo '<div class="inline-block divButAction"><a class="butAction" href="gestion.php?action=add">Ajouter une récurrence</a></div>';
+		echo '</div>';
 	}
-} else {
-	echo '<div class="tabsAction">';
-		echo '
-		<div class="inline-block divButAction">
-			<input type="submit" class="butAction" value="Payer les récurrences sélectionnées" />
-		</div>';
-		
-		echo '<div class="inline-block divButAction"><a class="butAction" href="gestion.php?action=add">Ajouter une récurrence</a></div>';
-	echo '</div>';
 }
 
 echo '</form>';
