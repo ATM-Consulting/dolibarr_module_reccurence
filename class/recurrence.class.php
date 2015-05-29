@@ -104,4 +104,21 @@ class TRecurrence extends TObjetStd {
 		
 		return $recurrence;
 	}
+	
+	static function get_prochaines_charges(&$PDOdb, $id_recurrence) {
+		$sql = '
+			SELECT c.rowid, c.date_ech, c.libelle, c.entity, c.fk_type, c.amount, c.paye, c.periode, c.tms, c.date_creation, c.date_valid, e.fk_source
+			FROM ' . MAIN_DB_PREFIX . 'chargesociales as c
+			INNER JOIN ' . MAIN_DB_PREFIX . 'element_element as e ON e.fk_target = c.rowid
+			WHERE e.fk_source = ' . $id_recurrence . '
+			AND e.sourcetype = "chargesociales"
+			AND e.targettype = "chargesociales"
+			AND c.paye = 0
+			ORDER BY c.periode
+		';
+
+		$Tab = $PDOdb->ExecuteAsArray($sql);
+		
+		return $Tab;
+	}
 }

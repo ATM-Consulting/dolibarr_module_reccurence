@@ -157,7 +157,7 @@ if ($action == 'add_payment')
 
 				if (! $error) {
 	                $db->commit();
-	                $loc = DOL_URL_ROOT.'/compta/charges/index.php?leftmenu=tax_social&mainmenu=accountancy&mode=sconly';
+	                $loc = DOL_URL_ROOT.'/compta/sociales/index.php?leftmenu=tax_social';
 	                header('Location: '.$loc);
 	                exit;
 	            } else {
@@ -261,7 +261,7 @@ if (!empty($TRecurrences)) {
 	
 	// Récupération des charges créées à partir de celle là et non payée
 	$sql = '
-		SELECT c.rowid
+		SELECT c.rowid, e.fk_source
 		FROM ' . MAIN_DB_PREFIX . 'chargesociales as c
 		INNER JOIN ' . MAIN_DB_PREFIX . 'element_element as e ON e.fk_target = c.rowid
 		WHERE e.fk_source IN (' . $recurrences . ')
@@ -283,6 +283,8 @@ if (!empty($TRecurrences)) {
 	$total=0;
 	$totalrecu=0;
 	
+	$TPreChecked = array();
+	
 	foreach ($Tab as $c) {
 		$charge = new ChargeSociales($db);
 		$charge->fetch($c->rowid);
@@ -291,7 +293,13 @@ if (!empty($TRecurrences)) {
 
 		print "<tr ".$bc[$var].">";
 		
-		print '<td><input type="checkbox" name="selected_charges[]" value="' . $charge->id . '" /></td>';
+		if (!in_array($c->fk_source, $TPreChecked)) {
+			print '<td><input type="checkbox" name="selected_charges[]" value="' . $charge->id . '" checked /></td>';
+			$TPreChecked[] = $c->fk_source;	
+		} else {
+			print '<td><input type="checkbox" name="selected_charges[]" value="' . $charge->id . '" /></td>';
+		}
+		
 		print '<td>' . $charge->getNomUrl(1) . ' - ' . htmlentities($charge->lib) . '</td>';
 		print '<td>' . dol_print_date($charge->periode, 'day') . '</td>';
 		print '<td>' . price($charge->amount, 2) . '</td>';

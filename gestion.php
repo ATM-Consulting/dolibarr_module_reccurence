@@ -146,6 +146,8 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			$recurrence = TRecurrence::get_recurrence($PDOdb, $charge_sociale->id);
 		}
 		
+		$TNextCharges = TRecurrence::get_prochaines_charges($PDOdb, $charge_sociale->id);
+		
 		echo '<tr ' . $bc[$var] . '>';
 		if ($action != 'add') {
 			echo '<td><input type="checkbox" name="recurrences[]" value="' . $charge_sociale->id . '" style="margin: 0 0 0 4px;" /></td>';
@@ -156,6 +158,14 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		echo '<td>' . utf8_encode($obj->libelle) . '</td>';
 		echo '<td>' . utf8_encode($obj->type_lib) . '</td>'; // Type
 		echo '<td>' . dol_print_date($obj->periode, 'day') . '</td>';
+		
+		// Affiche la date de la prochaine charge créée à partir de cette récurrence
+		if (!empty($TNextCharges)) {
+			echo '<td>' . dol_print_date($TNextCharges[0]->periode, 'day') . '</td>';
+		} else {
+			echo '<td></td>';
+		}
+		
 		echo '<td>' . price($obj->amount, 2) . '</td>';
 		
 		echo '<td>';
@@ -214,6 +224,7 @@ function _print_head_tab_charges_sociales() {
 		print_liste_field_titre('Libellé', $_SERVER['PHP_SELF'], 'libelle');
 		print_liste_field_titre('Type', $_SERVER['PHP_SELF'], 'type_lib');
 		print_liste_field_titre('Date', $_SERVER['PHP_SELF'], 'periode');
+		print_liste_field_titre('Prochaine charge à payer', $_SERVER['PHP_SELF'], 'periode');
 		print_liste_field_titre('Montant', $_SERVER['PHP_SELF'], 'amount');
 		print_liste_field_titre('Récurrence', $_SERVER['PHP_SELF'], 'fk_recurrence');
 		print_liste_field_titre('Date de fin', $_SERVER['PHP_SELF'], 'fk_recurrence');
