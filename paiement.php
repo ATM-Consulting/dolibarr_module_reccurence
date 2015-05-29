@@ -43,9 +43,10 @@ if ($user->societe_id > 0)
 	$socid = $user->societe_id;
 }
 
-if (!empty(GETPOST('cancel'))) {
+$cancel = GETPOST('cancel');
+if (!empty($cancel)) {
 	header('Location: gestion.php');
-	exit;	
+	exit;
 }
 
 /*
