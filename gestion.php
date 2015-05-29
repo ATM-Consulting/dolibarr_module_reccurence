@@ -94,7 +94,7 @@ llxfooter();
  * Liste des charges sociales
  */
 function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
-	global $conf, $db, $user;
+	global $conf, $db, $user, $bc;
 	
 	$charge_sociale = new ChargeSociales($PDOdb);
 	
@@ -131,9 +131,13 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	echo '<table class="noborder" width="100%">';
 	_print_head_tab_charges_sociales();
 
+	$var = true;
+	
 	echo '<tbody>';
 
 	foreach ($result as $obj) {
+		$var = !$var;
+		
 		$charge_sociale->id  = $obj->id;
 		$charge_sociale->lib = $obj->id;
 		$charge_sociale->ref = $obj->id;
@@ -142,7 +146,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			$recurrence = TRecurrence::get_recurrence($PDOdb, $charge_sociale->id);
 		}
 		
-		echo '<tr>';
+		echo '<tr ' . $bc[$var] . '>';
 		if ($action != 'add') {
 			echo '<td><input type="checkbox" name="recurrences[]" value="' . $charge_sociale->id . '" style="margin: 0 0 0 4px;" /></td>';
 		} else {
