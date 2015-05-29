@@ -34,6 +34,8 @@ $id_charge = GETPOST("id");
 $action = GETPOST('action');
 $amounts = array();
 
+$TRecurrences = GETPOST('recurrences'); // Tableau des récurrences à payer
+
 // Security check
 $socid=0;
 if ($user->societe_id > 0)
@@ -41,6 +43,10 @@ if ($user->societe_id > 0)
 	$socid = $user->societe_id;
 }
 
+if (!empty(GETPOST('cancel'))) {
+	header('Location: gestion.php');
+	exit;	
+}
 
 /*
  * Actions
@@ -161,6 +167,12 @@ if ($action == 'add_payment')
 	}
 
 	$_GET["action"]='create';
+} else if (empty($TRecurrences)) {
+	$message = 'Veuillez sélectionner au moins une récurrence à payer.';
+	setEventMessage($message, 'errors');
+			
+	header('Location: gestion.php');
+	exit;
 }
 
 
@@ -172,9 +184,10 @@ llxHeader();
 
 $form=new Form($db);
 
-
 // Formulaire de creation d'un paiement de charge
-if ($id_charge > 0) {
+if (!empty($TRecurrences)) {
+	$recurrences = implode(',', $TRecurrences); // Récupération des récurrences pour requête
+	
 	print_fiche_titre($langs->trans("DoPayment"));
 	print "<br>\n";
 
@@ -182,29 +195,10 @@ if ($id_charge > 0) {
 		print "<div class=\"error\">$mesg</div>";
 	}
 	
-	// Récupération de la charge sociale sur laquelle la récurrence a été placée
-	$charge_recurrente = new ChargeSociales($db);
-	$charge_recurrente->fetch($id_charge);
-
-	$price = $charge_recurrente->amount;
-	
-	// Récupération des charges créées à partir de celle là et non payée
-	$sql = '
-		SELECT c.rowid
-		FROM ' . MAIN_DB_PREFIX . 'chargesociales as c
-		INNER JOIN ' . MAIN_DB_PREFIX . 'element_element as e ON e.fk_target = c.rowid
-		WHERE e.fk_source = ' . $charge_recurrente->id . '
-		AND e.sourcetype = "chargesociales"
-		AND e.targettype = "chargesociales"
-		AND c.paye = 0
-	';
-	
-	$Tab = $PDOdb->ExecuteAsArray($sql);
-	
 	print '<form name="add_payment" action="'.$_SERVER['PHP_SELF'].'" method="post">';
 	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-	print '<input type="hidden" name="id" value="'.$id_charge.'">';
-	print '<input type="hidden" name="chid" value="'.$id_charge.'">';
+	print '<input type="hidden" name="id" value="'.$charge_recurrente->id.'">';
+	print '<input type="hidden" name="chid" value="'.$charge_recurrente->id.'">';
 	print '<input type="hidden" name="action" value="add_payment">';
 	
 	print '<table cellspacing="0" class="border" width="100%" cellpadding="2">';
@@ -245,13 +239,7 @@ if ($id_charge > 0) {
 	print '</table>';
 
 	print '<br>';
-
-	/*
- 	 * Autres charges impayees
-	 */
-	$num = 1;
-	$i = 0;
-
+	
 	print '<table class="noborder" width="100%">';
 	print '<tr class="liste_titre">';
 
@@ -263,6 +251,32 @@ if ($id_charge > 0) {
 	print '<td>Reste à payer</td>';
 	print '<td>Montant paiement</td>';
 	print "</tr>\n";
+
+	// Récupération de la charge sociale sur laquelle la récurrence a été placée
+	$charge_recurrente = new ChargeSociales($db);
+	$charge_recurrente->fetch($id_recurrence);
+
+	$price = $charge_recurrente->amount;
+	
+	// Récupération des charges créées à partir de celle là et non payée
+	$sql = '
+		SELECT c.rowid
+		FROM ' . MAIN_DB_PREFIX . 'chargesociales as c
+		INNER JOIN ' . MAIN_DB_PREFIX . 'element_element as e ON e.fk_target = c.rowid
+		WHERE e.fk_source IN (' . $recurrences . ')
+		AND e.sourcetype = "chargesociales"
+		AND e.targettype = "chargesociales"
+		AND c.paye = 0
+		ORDER BY c.periode
+	';
+	
+	$Tab = $PDOdb->ExecuteAsArray($sql);
+
+	/*
+ 	 * Autres charges impayees
+	 */
+	$num = 1;
+	$i = 0;
 
 	$var=True;
 	$total=0;
@@ -306,13 +320,22 @@ if ($id_charge > 0) {
 		
 		print '</tr>';
 	}
-
+	
+	if (empty($Tab)) {
+		print "<tr ".$bc[$var].">";
+		print '<td colspan="7" style="text-align: center;">Aucune charge impayées.</td>';
+		print '</tr>';
+	}
+	
 	print "</table>";
-
+	
 	print '<br><center>';
 
-	print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
-	print '&nbsp; &nbsp;';
+	if (!empty($Tab)) {
+		print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+		print '&nbsp; &nbsp;';
+	}
+	
 	print '<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
 
 	print '</center>';

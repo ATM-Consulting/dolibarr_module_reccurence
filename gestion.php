@@ -27,6 +27,8 @@ print dol_get_fiche_head(array(
 	array(DOL_URL_ROOT.'/custom/recurrence/gestion.php?action=add', 'Enregistrer une tâche récurrente', 'add')
 )  , $action, '');
 
+echo '<form method="POST" action="paiement.php">'; // Formulaire pour la gestion des paiements
+
 _liste_charges_sociales($PDOdb, $action, $page, $limit, $offset);
 
 if ($action == 'add') {
@@ -36,10 +38,17 @@ if ($action == 'add') {
 		</a>';
 	}
 } else {
-	echo '<a href="gestion.php?action=add">
-		<button class="butAction" style="float: right;">Ajouter une récurrence</button>
-	</a>';
+	echo '<div class="tabsAction">';
+		echo '
+		<div class="inline-block divButAction">
+			<input type="submit" class="butAction" value="Payer les récurrences sélectionnées" />
+		</div>';
+		
+		echo '<div class="inline-block divButAction"><a class="butAction" href="gestion.php?action=add">Ajouter une récurrence</a></div>';
+	echo '</div>';
 }
+
+echo '</form>';
 
 echo '<div style="clear: both;"></div>';
 
@@ -53,7 +62,9 @@ llxfooter();
 			defaultDate: null
 		}).val();
 	
-		$('.update-recurrence, .delete-recurrence').click(function() {
+		$('.update-recurrence, .delete-recurrence').click(function(e) {
+			e.preventDefault();
+			
 			var type 		 = $(this).attr('class');
 			var id_charge 	 = $(this).data('chargesociale');
 			var periode		 = $('#periode_' + id_charge + ' option:selected').val();
@@ -126,7 +137,11 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		}
 		
 		echo '<tr>';
-
+		if ($action != 'add') {
+			echo '<td><input type="checkbox" name="recurrences[]" value="' . $charge_sociale->id . '" style="margin: 0 0 0 4px;" /></td>';
+		} else {
+			echo '<td></td>';
+		}
 		echo '<td>' . $charge_sociale->getNomUrl(1,'20') . '</td>';
 		echo '<td>' . utf8_encode($obj->libelle) . '</td>';
 		echo '<td>' . utf8_encode($obj->type_lib) . '</td>'; // Type
@@ -134,10 +149,12 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		echo '<td>' . price($obj->amount, 2) . '</td>';
 		
 		echo '<td>';
-		if ($action == 'add')
+		if ($action == 'add') {
 			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', 'mensuel');
-		else
+		} else {
 			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', $recurrence->periode);
+		}
+		
 		echo '</td>';
 		
 		if ($action == 'add') {
@@ -155,12 +172,9 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 
 		if ($user->rights->tax->charges->creer) {
 			if ($action == 'add') {
-				echo '<td><button class="update-recurrence" data-chargesociale="' . $obj->id . '">Ajouter</button></td>';
+				echo '<td><button class="update-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Ajouter</button></td>';
 			} else {
 				echo '<td>
-					<a href="paiement.php?id=' . $obj->id . '">
-						<button class="pay-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Payer</button>
-					</a>
 					<button class="update-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Modifier</button>
 					<button class="delete-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Supprimer</button>
 				</td>';
@@ -185,6 +199,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 function _print_head_tab_charges_sociales() {
 	echo '<thead>';
 		echo '<tr class="liste_titre">';
+		echo '<th class="liste_titre"></th>';
 		print_liste_field_titre('Ref', $_SERVER['PHP_SELF'], 'id');
 		print_liste_field_titre('Libellé', $_SERVER['PHP_SELF'], 'libelle');
 		print_liste_field_titre('Type', $_SERVER['PHP_SELF'], 'type_lib');
