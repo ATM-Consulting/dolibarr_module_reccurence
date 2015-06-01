@@ -38,9 +38,16 @@ _liste_charges_sociales($PDOdb, $action, $page, $limit, $offset);
 if ($user->rights->tax->charges->creer) {
 	if ($action == 'add') {
 		if ($user->rights->tax->charges->creer) {
-			echo '<a href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
-				<button class="butAction" style="float: right;">Ajouter une charge sociale</button>
-			</a>';
+			echo '<div class="tabsAction">';
+			
+			echo '
+			<div class="inline-block divButAction">
+				<a class="butAction" href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
+					Ajouter une charge sociale
+				</a>
+			</div>';
+			
+			echo '</div>';
 		}
 	} else {
 		echo '<div class="tabsAction">';
