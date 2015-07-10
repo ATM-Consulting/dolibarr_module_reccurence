@@ -7,10 +7,12 @@ if(!defined('INC_FROM_DOLIBARR')) {
     define('INC_FROM_CRON_SCRIPT', true);
     
     require '../config.php';
-    require '../class/recurrence.class.php';
+    
     
     
 }
+
+dol_include_once('/recurrence/class/recurrence.class.php');
  
 $PDOdb=new TPDOdb;
 
