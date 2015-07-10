@@ -170,8 +170,9 @@ class modRecurrence extends DolibarrModules
 		
 		$sql = array();
 
-		$url = dol_buildpath('/recurrence/script/create-maj-base.php', 2);
-		file_get_contents($url);
+        define('INC_FROM_DOLIBARR', true);
+		dol_include_once('/recurrence/script/create-maj-base.php');
+		
 		
 		$TValues = array(
 			'label' => 'Mise à jour récurrence',
