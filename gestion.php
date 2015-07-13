@@ -1,7 +1,7 @@
 <?php
 require_once 'config.php';
-require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/chargesociales.class.php';
-require_once DOL_DOCUMENT_ROOT . '/custom/recurrence/class/recurrence.class.php';
+dol_include_once('/compta/sociales/class/chargesociales.class.php');
+dol_include_once('/recurrence/class/recurrence.class.php');
 
 $langs->load('recurrence@recurrence');
 
@@ -27,8 +27,8 @@ llxHeader('', 'Récurrence des charges sociales');
 print_fiche_titre('Récurrence des charges sociales', '', 'report.png@report');
 
 print dol_get_fiche_head(array(
-	array(DOL_URL_ROOT.'/custom/recurrence/gestion.php?action=view', 'Liste des récurrences', 'view'),
-	array(DOL_URL_ROOT.'/custom/recurrence/gestion.php?action=add', 'Enregistrer une tâche récurrente', 'add')
+	array(dol_buildpath('/recurrence/gestion.php?action=view', 1), 'Liste des récurrences', 'view'),
+	array(dol_buildpath('/recurrence/gestion.php?action=add', 1), 'Enregistrer une tâche récurrente', 'add')
 )  , $action, '');
 
 echo '<form method="POST" action="paiement.php">'; // Formulaire pour la gestion des paiements

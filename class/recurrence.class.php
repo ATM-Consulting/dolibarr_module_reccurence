@@ -1,6 +1,6 @@
 <?php
-require_once DOL_DOCUMENT_ROOT . '/compta/sociales/class/chargesociales.class.php';
-require_once DOL_DOCUMENT_ROOT . '/custom/recurrence/class/cronrecurrence.class.php';
+dol_include_once('/compta/sociales/class/chargesociales.class.php');
+dol_include_once('/recurrence/class/cronrecurrence.class.php');
 
 class TRecurrence extends TObjetStd {
 	public static $TPeriodes = array(
