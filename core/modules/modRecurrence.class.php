@@ -131,6 +131,13 @@ class modRecurrence extends DolibarrModules
 		// Permissions
 		$this->rights = array();		// Permission array used by this module
 		$r=0;
+		
+		$this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
+		$this->rights[$r][1] = 'Visualiser les charges sociales';	// Permission label
+		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
+		$this->rights[$r][4] = 'all';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = 'read';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$r++;
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
@@ -149,7 +156,7 @@ class modRecurrence extends DolibarrModules
 			'langs'		=> 'mylangfile@recurrence',
 			'position'	=> 100,
 			'enabled'  	=> '1',
-			'perms'	 	=> '1',
+			'perms'	 	=> '$user->rights->recurrence->all->read',
 			'target' 	=> '',
 			'level'		=> 2,
 			'user'	 	=> 0

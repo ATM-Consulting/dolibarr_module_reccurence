@@ -15,7 +15,7 @@ if ($page < 0) $page = 0;
 $limit  = $conf->liste_limit;
 $offset = $limit * $page;
 
-if (!$user->rights->tax->charges->lire) {
+if (!$user->rights->recurrence->all->read) {
 	accessforbidden();	
 }
 
