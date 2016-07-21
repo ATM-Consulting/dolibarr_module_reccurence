@@ -80,11 +80,23 @@ class TRecurrence extends TObjetStd {
 	}
 	
 	static function del(&$PDOdb, $id_charge) {
+		global $conf,$db,$user;
 		$recurrence = self::get_recurrence($PDOdb, $id_charge);
 		
 		if (isset($recurrence)) {
 			$message = 'Récurrence de la charge sociale ' . $id_charge . ' supprimée.';
 			setEventMessage($message);
+			
+			//Suppression de toutes les charges sociales créé dans le futur lié à cette récurrence
+			if($conf->global->RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES){
+				$TCharges = self::get_prochaines_charges($PDOdb, $id_charge,date('Y-m-d'));
+				
+				foreach($TCharges as $charge){
+					$chargesocial = new ChargeSociales($db);
+					$chargesocial->fetch($charge->rowid);
+					$chargesocial->delete($user);
+				}
+			}
 			
 			return $recurrence->delete($PDOdb);
 		} else {
@@ -105,7 +117,7 @@ class TRecurrence extends TObjetStd {
 		return $recurrence;
 	}
 	
-	static function get_prochaines_charges(&$PDOdb, $id_recurrence) {
+	static function get_prochaines_charges(&$PDOdb, $id_recurrence,$dt_deb='') {
 		$sql = '
 			SELECT c.rowid, c.date_ech, c.libelle, c.entity, c.fk_type, c.amount, c.paye, c.periode, c.tms, c.date_creation, c.date_valid, e.fk_source
 			FROM ' . MAIN_DB_PREFIX . 'chargesociales as c
@@ -113,10 +125,14 @@ class TRecurrence extends TObjetStd {
 			WHERE e.fk_source = ' . $id_recurrence . '
 			AND e.sourcetype = "chargesociales"
 			AND e.targettype = "chargesociales"
-			AND c.paye = 0
-			ORDER BY c.periode
-		';
-
+			AND c.paye = 0';
+		
+		if($dt_deb){
+			$sql .= ' AND c.periode > '.$dt_deb.' ';
+		}
+		
+		$sql .= ' ORDER BY c.periode';
+		
 		$Tab = $PDOdb->ExecuteAsArray($sql);
 		
 		return $Tab;
