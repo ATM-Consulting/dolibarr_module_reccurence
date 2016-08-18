@@ -15,6 +15,7 @@ $id_charge 	  = __get('id_charge');
 $periode 	  = __get('periode');
 $date_fin_rec = __get('date_fin_rec');
 $nb_prev_rec  = __get('nb_prev_rec');
+$montant  	  = __get('montant');
 
 if (empty($nb_prev_rec))
 	$nb_prev_rec = 0;
@@ -22,4 +23,4 @@ if (empty($nb_prev_rec))
 if ($type == 'delete-recurrence')
 	TRecurrence::del($PDOdb, $id_charge);
 else	
-	TRecurrence::update($PDOdb, $id_charge, $periode, $date_fin_rec, $nb_prev_rec);
+	TRecurrence::update($PDOdb, $id_charge, $periode, $date_fin_rec, $nb_prev_rec, $montant);

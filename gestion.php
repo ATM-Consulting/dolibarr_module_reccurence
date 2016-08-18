@@ -83,11 +83,19 @@ llxfooter();
 			var periode		 = $('#periode_' + id_charge + ' option:selected').val();
 			var date_fin_rec = $('#date_fin_rec_' + id_charge).datepicker().val();
 			var nb_prev_rec  = $('#nb_prev_rec_' + id_charge).val();
+			var montant  	 = $('#montant_' + id_charge).val();
 			
 			$.ajax({
 				type: 'POST',
 				url: 'script/update-recurrence.php',
-				data: { type: type, id_charge: id_charge, periode: periode, date_fin_rec: date_fin_rec, nb_prev_rec: nb_prev_rec }
+				data: { 
+					type: type, 
+					id_charge: id_charge, 
+					periode: periode, 
+					date_fin_rec: date_fin_rec, 
+					nb_prev_rec: nb_prev_rec,
+					montant: montant
+				}
 			}).done(function(data) {
 				document.location.reload(true);
 			});
@@ -106,11 +114,11 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	$charge_sociale = new ChargeSociales($PDOdb);
 	
 	$sql = "
-		SELECT cs.rowid as id, cs.fk_type as type, cs.amount, cs.date_ech, cs.libelle, cs.paye, cs.periode, c.libelle as type_lib, SUM(pc.amount) as alreadypayed
+		SELECT cs.rowid as id, cs.fk_type as type, cs.amount, cs.date_ech, cs.libelle, cs.paye, cs.periode, c.libelle as type_lib, SUM(pc.amount) as alreadypayed, 
+		(SELECT r.montant FROM " . MAIN_DB_PREFIX . "recurrence as r WHERE r.fk_chargesociale = cs.rowid) montant_reccur
 		FROM " . MAIN_DB_PREFIX . "c_chargesociales as c
 		INNER JOIN " . MAIN_DB_PREFIX . "chargesociales as cs ON c.id = cs.fk_type
 		LEFT JOIN " . MAIN_DB_PREFIX . "paiementcharge as pc ON pc.fk_charge = cs.rowid
-		
 		WHERE cs.fk_type = c.id
 		AND cs.entity = "  . $conf->entity . "
 		AND cs.rowid NOT IN (SELECT fk_target FROM " . MAIN_DB_PREFIX . "element_element WHERE sourcetype = 'chargesociales' AND targettype = 'chargesociales')
@@ -124,7 +132,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	$sql .= 'GROUP BY cs.rowid, cs.fk_type, cs.amount, cs.date_ech, cs.libelle, cs.paye, cs.periode, c.libelle ';
 	$sql .= 'ORDER BY cs.periode DESC ';
 	$sql .= 'LIMIT ' . $offset . ', ' . ($limit + 1);
-
+	
 	$res = $PDOdb->Execute($sql);
 	
 	$result = $PDOdb->Get_All();
@@ -175,7 +183,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			}
 		}
 		
-		echo '<td>' . price($obj->amount, 2) . '</td>';
+		echo '<td><input type="text" id="montant_' . $obj->id . '" name="montant" value="'.(($obj->montant_reccur > 0) ? $obj->montant_reccur : $obj->amount).'" /></td>';
 		
 		echo '<td>';
 		if ($action == 'add') {

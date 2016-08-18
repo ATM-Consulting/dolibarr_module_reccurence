@@ -20,6 +20,7 @@ class TRecurrence extends TObjetStd {
 		parent::add_champs('periode', array('type' => 'text'));
 		parent::add_champs('nb_previsionnel', array('type' => 'entier'));
 		parent::add_champs('date_fin', array('type' => 'date'));
+		parent::add_champs('montant', array('type' => 'float'));
 		
 		parent::_init_vars();
 		parent::start();
@@ -46,7 +47,7 @@ class TRecurrence extends TObjetStd {
 	/*
 	 * Fonction permettant d'ajouter ou modifier une récurrence selon si elle existe ou non
 	 */
-	static function update(&$PDOdb, $id_charge, $periode, $date_fin_rec, $nb_previsionnel) {
+	static function update(&$PDOdb, $id_charge, $periode, $date_fin_rec, $nb_previsionnel, $montant) {
 		global $db;
 		
 		if (!empty($date_fin_rec) && !preg_match('/([0-9]{2}[\/-]?){2}([0-9]{4})/', $date_fin_rec))
@@ -60,7 +61,8 @@ class TRecurrence extends TObjetStd {
 		$recurrence->fk_chargesociale = $id_charge;
 		$recurrence->periode 		  = $periode;
 		$recurrence->nb_previsionnel  = $nb_previsionnel;
-		
+		$recurrence->montant  		  = $montant;
+
 		if (!empty($date_fin_rec)) {
 			$date = explode('/', $date_fin_rec); // $recurrence->date_fin je dirais que c'est déjà init
 			$recurrence->date_fin = dol_mktime(0, 0, 0, $date[1], $date[0], $date[2]);
@@ -136,5 +138,25 @@ class TRecurrence extends TObjetStd {
 		$Tab = $PDOdb->ExecuteAsArray($sql);
 		
 		return $Tab;
+	}
+	
+	function save(&$PDOdb){
+		global $db,$user;
+		
+		parent::save($PDOdb);
+		
+		$TCharges = $this->get_prochaines_charges($PDOdb,$this->fk_chargesociale,date('Y-m-d'));
+
+		foreach ($TCharges as $data) {
+			
+			$chargesociale = new ChargeSociales($db);
+			$chargesociale->fetch($data->rowid);
+			
+			$chargesociale->amount = price2num($this->montant);
+			
+			echo $chargesociale->amount.'<br>';
+			
+			$chargesociale->update($user);
+		}
 	}
 }
