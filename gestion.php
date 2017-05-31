@@ -39,10 +39,12 @@ if ($user->rights->tax->charges->creer) {
 	if ($action == 'add') {
 		if ($user->rights->tax->charges->creer) {
 			echo '<div class="tabsAction">';
+$url = (float)DOL_VERSION>=5 ? '/compta/sociales/card.php?leftmenu=tax_social&action=create' : '/compta/sociales/charges.php?leftmenu=tax_social&action=create';
 			
 			echo '
 			<div class="inline-block divButAction">
-				<a class="butAction" href="' . DOL_URL_ROOT . '/compta/sociales/charges.php?leftmenu=tax_social&action=create">
+
+				<a class="butAction" href="' . DOL_URL_ROOT . $url .'">
 					Ajouter une charge sociale
 				</a>
 			</div>';
@@ -112,7 +114,6 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	global $conf, $db, $user, $bc;
 	
 	$charge_sociale = new ChargeSociales($PDOdb);
-	
 	$sql = "
 		SELECT cs.rowid as id, cs.fk_type as type, cs.amount, cs.date_ech, cs.libelle, cs.paye, cs.periode, c.libelle as type_lib, SUM(pc.amount) as alreadypayed, 
 		(SELECT r.montant FROM " . MAIN_DB_PREFIX . "recurrence as r WHERE r.fk_chargesociale = cs.rowid) montant_reccur
@@ -134,10 +135,8 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	$sql .= 'LIMIT ' . $offset . ', ' . ($limit + 1);
 	
 	$res = $PDOdb->Execute($sql);
-	
 	$result = $PDOdb->Get_All();
 	$num = count($result);
-	
 	$param = '&action=' . $action;
 	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $limit + 1);
 	
