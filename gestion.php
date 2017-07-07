@@ -173,8 +173,8 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 			echo '<td></td>';
 		}
 		echo '<td>' . $charge_sociale->getNomUrl(1,'20') . '</td>';
-		echo '<td>' . utf8_encode($obj->libelle) . '</td>';
-		echo '<td>' . utf8_encode($obj->type_lib) . '</td>'; // Type
+		echo '<td>' . $obj->libelle . '</td>';
+		echo '<td>' . $obj->type_lib . '</td>'; // Type
 		echo '<td>' . dol_print_date($obj->periode, 'day') . '</td>';
 		
 		if ($action != 'add') {
