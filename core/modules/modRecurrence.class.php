@@ -150,7 +150,7 @@ class modRecurrence extends DolibarrModules
 			'fk_menu'	=> 'fk_mainmenu=accountancy,fk_leftmenu=tax',
 			'type'		=> 'left',
 			'titre'		=> 'Récurrence charges sociales',
-			'mainmenu'	=> 'tax',
+			'mainmenu'	=> 'accountancy',
 			'leftmenu'	=> 'tax_social',
 			'url'		=> '/recurrence/gestion.php',
 			'langs'		=> 'mylangfile@recurrence',

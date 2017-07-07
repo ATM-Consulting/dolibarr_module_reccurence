@@ -41,6 +41,10 @@ if ($user->rights->tax->charges->creer) {
 			echo '<div class="tabsAction">';
 $url = (float)DOL_VERSION>=5 ? '/compta/sociales/card.php?leftmenu=tax_social&action=create' : '/compta/sociales/charges.php?leftmenu=tax_social&action=create';
 			
+			$urlPage = 'charges.php';
+			if(version_compare(DOL_VERSION, '5.0', '>=')) {
+				$urlPage = 'card.php';
+			}
 			echo '
 			<div class="inline-block divButAction">
 
