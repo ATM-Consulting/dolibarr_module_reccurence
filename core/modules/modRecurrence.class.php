@@ -185,7 +185,7 @@ class modRecurrence extends DolibarrModules
 		$TValues = array(
 			'label' => 'Mise à jour récurrence',
 			'jobtype' => 'method',
-			'frequency' => 86400,
+			'frequency' => 1,
 			'unitfrequency' => 86400,
 			'status' => 1,
 			'module_name' => 'recurrence',
