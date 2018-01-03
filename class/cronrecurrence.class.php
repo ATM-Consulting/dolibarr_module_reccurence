@@ -8,12 +8,15 @@ class TCronRecurrence {
 		$this->db = $db;
 	}
 	
-	function run() {	
+	// TODO WARNING si véritable cron : voir methode create_charge_sociale()
+	function run($entity=0) {
 		// Récupération de la liste des charges récurrentes
 		$sql = "
-			SELECT rowid, fk_chargesociale, periode, nb_previsionnel, date_fin
-			FROM " . MAIN_DB_PREFIX . "recurrence
+			SELECT r.rowid, r.fk_chargesociale, r.periode, r.nb_previsionnel, r.date_fin
+			FROM " . MAIN_DB_PREFIX . "recurrence r
 		";
+		
+		if ($entity > 0) $sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'chargesociales cs ON (cs.rowid = r.fk_chargesociale AND cs.entity = '.$entity.')';
 		
 		$res = $this->db->query($sql);
 		
@@ -248,6 +251,7 @@ class TCronRecurrence {
 			$chargesociale->periode = $date;
 			$chargesociale->amount = $obj->amount;
 	
+			// TODO WARNING : si une tache cron fait appel à une routine pour créer les charges, il va y avoir un problème d'entité si multicompany et plusieurs charges sur plusieurs entités
 			$id = $chargesociale->create($user);
 					
 			$chargesociale->add_object_linked('chargesociales', $id_source);
