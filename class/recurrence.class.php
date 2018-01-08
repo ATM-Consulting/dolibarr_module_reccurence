@@ -48,7 +48,7 @@ class TRecurrence extends TObjetStd {
 	 * Fonction permettant d'ajouter ou modifier une récurrence selon si elle existe ou non
 	 */
 	static function update(&$PDOdb, $id_charge, $periode, $date_fin_rec, $nb_previsionnel, $montant) {
-		global $db;
+		global $db,$conf;
 		
 		if (!empty($date_fin_rec) && !preg_match('/([0-9]{2}[\/-]?){2}([0-9]{4})/', $date_fin_rec))
 			return false;
@@ -76,7 +76,7 @@ class TRecurrence extends TObjetStd {
 		setEventMessage($message);
 		
 		$task = new TCronRecurrence($db);
-		$task->run();
+		$task->run($conf->entity);
 		
 		return true;
 	}
