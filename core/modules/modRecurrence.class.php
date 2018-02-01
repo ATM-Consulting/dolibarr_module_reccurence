@@ -58,7 +58,7 @@ class modRecurrence extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Gestion des récurrences des charges sociales";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '1.0.2';
+		$this->version = '1.1.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -153,7 +153,7 @@ class modRecurrence extends DolibarrModules
 			'mainmenu'	=> 'accountancy',
 			'leftmenu'	=> 'tax_social',
 			'url'		=> '/recurrence/gestion.php',
-			'langs'		=> 'mylangfile@recurrence',
+			'langs'		=> 'recurrence@recurrence',
 			'position'	=> 100,
 			'enabled'  	=> '1',
 			'perms'	 	=> '$user->rights->recurrence->all->read',
@@ -161,6 +161,9 @@ class modRecurrence extends DolibarrModules
 			'level'		=> 2,
 			'user'	 	=> 0
 		);
+		
+		$r++;
+		
 	}
 
 	/**
@@ -180,7 +183,6 @@ class modRecurrence extends DolibarrModules
         define('INC_FROM_DOLIBARR', true);
         dol_include_once('/recurrence/config.php');
 		dol_include_once('/recurrence/script/create-maj-base.php');
-		
 		
 		$TValues = array(
 			'label' => 'Mise à jour récurrence',

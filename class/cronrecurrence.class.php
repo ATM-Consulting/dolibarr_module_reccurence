@@ -1,7 +1,7 @@
 <?php
 require_once DOL_DOCUMENT_ROOT.'/compta/sociales/class/chargesociales.class.php';
 
-class TCronRecurrence {
+class CronRecurrence {
 	public $db;
 	
 	function __construct(&$db) {

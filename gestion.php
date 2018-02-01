@@ -5,8 +5,6 @@ dol_include_once('/recurrence/class/recurrence.class.php');
 
 $langs->load('recurrence@recurrence');
 
-$PDOdb = new TPDOdb;
-
 $action = __get('action', 'view');
 
 $page   = __get('page', 0);
@@ -33,7 +31,7 @@ print dol_get_fiche_head(array(
 
 echo '<form method="POST" action="paiement.php">'; // Formulaire pour la gestion des paiements
 
-_liste_charges_sociales($PDOdb, $action, $page, $limit, $offset);
+_liste_charges_sociales( $action, $page, $limit, $offset);
 
 if ($user->rights->tax->charges->creer) {
 	if ($action == 'add') {
@@ -114,10 +112,10 @@ llxfooter();
 /*
  * Liste des charges sociales
  */
-function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
+function _liste_charges_sociales( $action, $page, $limit, $offset) {
 	global $conf, $db, $user, $bc;
 	
-	$charge_sociale = new ChargeSociales($PDOdb);
+	$charge_sociale = new ChargeSociales($db);
 	$sql = "
 		SELECT cs.rowid as id, cs.fk_type as type, cs.amount, cs.date_ech, cs.libelle, cs.paye, cs.periode, c.libelle as type_lib, SUM(pc.amount) as alreadypayed, 
 		(SELECT r.montant FROM " . MAIN_DB_PREFIX . "recurrence as r WHERE r.fk_chargesociale = cs.rowid) montant_reccur
@@ -138,9 +136,9 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	$sql .= 'ORDER BY cs.periode DESC ';
 	$sql .= 'LIMIT ' . $offset . ', ' . ($limit + 1);
 	
-	$res = $PDOdb->Execute($sql);
-	$result = $PDOdb->Get_All();
-	$num = count($result);
+	$res = $db->query($sql);
+	$num = $db->num_rows($res);
+	
 	$param = '&action=' . $action;
 	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $limit + 1);
 	
@@ -153,7 +151,7 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 	
 	echo '<tbody>';
 
-	foreach ($result as $obj) {
+	while($obj = $db->fetch_object($res)) {
 		$var = !$var;
 		
 		$charge_sociale->id  = $obj->id;
@@ -161,10 +159,10 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		$charge_sociale->ref = $obj->id;
 	
 		if ($action != 'add') {
-			$recurrence = TRecurrence::get_recurrence($PDOdb, $charge_sociale->id);
+			$recurrence = Recurrence::get_recurrence($charge_sociale->id);
 		}
 		
-		$TNextCharges = TRecurrence::get_prochaines_charges($PDOdb, $charge_sociale->id);
+		$TNextCharges = Recurrence::get_prochaines_charges($charge_sociale->id);
 		
 		echo '<tr ' . $bc[$var] . '>';
 		if ($action != 'add') {
@@ -190,9 +188,9 @@ function _liste_charges_sociales(&$PDOdb, $action, $page, $limit, $offset) {
 		
 		echo '<td>';
 		if ($action == 'add') {
-			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', 'mensuel');
+			Recurrence::get_liste_periodes( 'periode_' . $obj->id, 'fk_periode', 'mensuel');
 		} else {
-			TRecurrence::get_liste_periodes($PDOdb, 'periode_' . $obj->id, 'fk_periode', $recurrence->periode);
+			Recurrence::get_liste_periodes( 'periode_' . $obj->id, 'fk_periode', $recurrence->periode);
 		}
 		
 		echo '</td>';
