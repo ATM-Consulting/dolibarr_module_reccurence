@@ -128,6 +128,7 @@ class Recurrence extends SeedObject {
 		$recurrence->fetchBy($id_charge, 'fk_chargesociale');
 		
 		return $recurrence;
+		
 	}
 	
 	static function get_prochaines_charges( $id_recurrence,$dt_deb='') {
@@ -173,7 +174,7 @@ class Recurrence extends SeedObject {
 			
 			$chargesociale->amount = price2num($this->montant);
 			
-			echo $chargesociale->amount.'<br>';
+			echo $chargesociale->amount.'<br>';//TODO useless ?
 			
 			$chargesociale->update($user);
 		}

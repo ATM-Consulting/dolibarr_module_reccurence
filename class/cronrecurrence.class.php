@@ -10,6 +10,7 @@ class CronRecurrence {
 	
 	// TODO WARNING si véritable cron : voir methode create_charge_sociale()
 	function run($entity=0) {
+	    
 		// Récupération de la liste des charges récurrentes
 		$sql = "
 			SELECT r.rowid, r.fk_chargesociale, r.periode, r.nb_previsionnel, r.date_fin

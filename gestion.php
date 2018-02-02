@@ -69,7 +69,6 @@ echo '</form>';
 
 echo '<div style="clear: both;"></div>';
 
-llxfooter();
 ?>
 
 <script>
@@ -81,6 +80,8 @@ llxfooter();
 	
 		$('.update-recurrence, .delete-recurrence').click(function(e) {
 			e.preventDefault();
+
+			$(this).text("...").prop("disabled",1);
 			
 			var type 		 = $(this).attr('class');
 			var id_charge 	 = $(this).data('chargesociale');
@@ -108,6 +109,8 @@ llxfooter();
 </script>
 
 <?php
+
+llxfooter();
 
 /*
  * Liste des charges sociales
