@@ -28,8 +28,6 @@ require_once DOL_DOCUMENT_ROOT.'/compta/bank/class/account.class.php';
 
 $langs->load('recurrence@recurrence');
 
-$PDOdb = new TPDOdb;
-
 $id_charge = GETPOST("id");
 $action = GETPOST('action');
 $amounts = array();
@@ -271,7 +269,7 @@ if (!empty($TRecurrences)) {
 		ORDER BY c.periode
 	';
 	
-	$Tab = $PDOdb->ExecuteAsArray($sql);
+	$resql = $db->query($sql);
 
 	/*
  	 * Autres charges impayees
@@ -285,7 +283,7 @@ if (!empty($TRecurrences)) {
 	
 	$TPreChecked = array();
 	
-	foreach ($Tab as $c) {
+	while($c=$db->fetch_object($res)) {
 		$charge = new ChargeSociales($db);
 		$charge->fetch($c->rowid);
 

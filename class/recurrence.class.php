@@ -1,8 +1,10 @@
 <?php
+
 dol_include_once('/compta/sociales/class/chargesociales.class.php');
 dol_include_once('/recurrence/class/cronrecurrence.class.php');
 
-class TRecurrence extends TObjetStd {
+class Recurrence extends SeedObject {
+    
 	public static $TPeriodes = array(
 		'jour' 		=> 'Journalier',
 		'hebdo' 	=> 'Hebdomadaire',
@@ -11,25 +13,31 @@ class TRecurrence extends TObjetStd {
 		'annuel' 	=> 'Annuel'
 	);
 	
-	function __construct() {
-		global $langs;
-		
-		parent::set_table(MAIN_DB_PREFIX . 'recurrence');
-		
-		parent::add_champs('fk_chargesociale', array('type' => 'entier', 'index' => true));
-		parent::add_champs('periode', array('type' => 'text'));
-		parent::add_champs('nb_previsionnel', array('type' => 'entier'));
-		parent::add_champs('date_fin', array('type' => 'date'));
-		parent::add_champs('montant', array('type' => 'float'));
-		
-		parent::_init_vars();
-		parent::start();
-		
-		$this->lines = array();
-		$this->nbLines = 0;
+	public $element = 'recurrence';
+	
+	public $table_element='recurrence';
+	
+	function __construct($db) {
+	    
+	    $this->db = &$db;
+	    
+	    global $langs;
+	    
+	    $this->fields=array(
+	        'fk_chargesociale'=>array('type'=>'integer','index'=>true)
+	        ,'nb_previsionnel'=>array('type'=>'integer')
+	        ,'date_fin'=>array('type'=>'date','index'=>true)
+	        ,'montant'=>array('type'=>'double')
+	        ,'periode'=>array('type'=>'string','lenght'=>20,'index'=>true)
+	    );
+	    
+	    $this->init();
+	    
+	    $this->lines = array();
+	    $this->nbLines = 0;
 	}
 	
-	static function get_liste_periodes(&$PDOdb, $id, $name, $default = '') {
+	static function get_liste_periodes($id, $name, $default = '') {
 		echo '<select id="' . $id . '" name="' . $name . '">';
 	
 		foreach (self::$TPeriodes as $key => $periode) {
@@ -47,8 +55,8 @@ class TRecurrence extends TObjetStd {
 	/*
 	 * Fonction permettant d'ajouter ou modifier une récurrence selon si elle existe ou non
 	 */
-	static function update(&$PDOdb, $id_charge, $periode, $date_fin_rec, $nb_previsionnel, $montant) {
-		global $db,$conf;
+	static function updateReccurence($id_charge, $periode, $date_fin_rec, $nb_previsionnel, $montant) {
+	    global $db,$conf,$user;
 		
 		if (!empty($date_fin_rec) && !preg_match('/([0-9]{2}[\/-]?){2}([0-9]{4})/', $date_fin_rec))
 			return false;
@@ -56,7 +64,7 @@ class TRecurrence extends TObjetStd {
 		if ($nb_previsionnel < 0)
 			return false;
 		
-		$recurrence = self::get_recurrence($PDOdb, $id_charge);
+		$recurrence = self::get_recurrence($id_charge);
 
 		$recurrence->fk_chargesociale = $id_charge;
 		$recurrence->periode 		  = $periode;
@@ -70,20 +78,20 @@ class TRecurrence extends TObjetStd {
 			$recurrence->date_fin = null;
 		}
 
-		$recurrence->save($PDOdb);
+		$recurrence->update($user);
 		
-		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . TRecurrence::$TPeriodes[$periode] . ')';
+		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . Recurrence::$TPeriodes[$periode] . ')'; //TODO langs !
 		setEventMessage($message);
 		
-		$task = new TCronRecurrence($db);
+		$task = new CronRecurrence($db);
 		$task->run($conf->entity);
 		
 		return true;
 	}
 	
-	static function del(&$PDOdb, $id_charge) {
+	static function del($id_charge) {
 		global $conf,$db,$user;
-		$recurrence = self::get_recurrence($PDOdb, $id_charge);
+		$recurrence = self::get_recurrence( $id_charge);
 		
 		if (isset($recurrence)) {
 			$message = 'Récurrence de la charge sociale ' . $id_charge . ' supprimée.';
@@ -91,7 +99,7 @@ class TRecurrence extends TObjetStd {
 			
 			//Suppression de toutes les charges sociales créé dans le futur lié à cette récurrence
 			if($conf->global->RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES){
-				$TCharges = self::get_prochaines_charges($PDOdb, $id_charge,date('Y-m-d'));
+				$TCharges = self::get_prochaines_charges($id_charge,date('Y-m-d'));
 				
 				foreach($TCharges as $charge){
 					$chargesocial = new ChargeSociales($db);
@@ -100,7 +108,7 @@ class TRecurrence extends TObjetStd {
 				}
 			}
 			
-			return $recurrence->delete($PDOdb);
+			return $recurrence->delete($user);
 		} else {
 			$message = 'Suppression impossible : Récurrence de la charge sociale ' . $id_charge . ' introuvable.';
 			setEventMessage($message, 'errors');
@@ -112,14 +120,18 @@ class TRecurrence extends TObjetStd {
 	/*
 	 * Fonction permettant de récupérer une récurrence à partir de l'ID de la charge
 	 */
-	static function get_recurrence(&$PDOdb, $id_charge) {
-		$recurrence = new TRecurrence;
-		$recurrence->loadBy($PDOdb, $id_charge, 'fk_chargesociale');
+	static function get_recurrence($id_charge) {
+	    
+	    global $db;
+	    
+		$recurrence = new Recurrence($db);
+		$recurrence->fetchBy($id_charge, 'fk_chargesociale');
 		
 		return $recurrence;
+		
 	}
 	
-	static function get_prochaines_charges(&$PDOdb, $id_recurrence,$dt_deb='') {
+	static function get_prochaines_charges( $id_recurrence,$dt_deb='') {
 		$sql = '
 			SELECT c.rowid, c.date_ech, c.libelle, c.entity, c.fk_type, c.amount, c.paye, c.periode, c.tms, c.date_creation, c.date_valid, e.fk_source
 			FROM ' . MAIN_DB_PREFIX . 'chargesociales as c
@@ -135,17 +147,25 @@ class TRecurrence extends TObjetStd {
 		
 		$sql .= ' ORDER BY c.periode';
 		
-		$Tab = $PDOdb->ExecuteAsArray($sql);
+		global $db;
+		
+		$res = $db->query($sql);
+		if(!$res) return false;
+		
+		$Tab=array();
+		while($obj = $db->fetch_object($res)) {
+		    $Tab[] = $obj;
+		}
 		
 		return $Tab;
 	}
 	
-	function save(&$PDOdb){
-		global $db,$user;
+	function update(User &$user){
+		global $db;
 		
-		parent::save($PDOdb);
+		parent::update($user);
 		
-		$TCharges = $this->get_prochaines_charges($PDOdb,$this->fk_chargesociale,date('Y-m-d'));
+		$TCharges = $this->get_prochaines_charges($this->fk_chargesociale,date('Y-m-d'));
 
 		foreach ($TCharges as $data) {
 			
@@ -154,7 +174,7 @@ class TRecurrence extends TObjetStd {
 			
 			$chargesociale->amount = price2num($this->montant);
 			
-			echo $chargesociale->amount.'<br>';
+			echo $chargesociale->amount.'<br>';//TODO useless ?
 			
 			$chargesociale->update($user);
 		}
