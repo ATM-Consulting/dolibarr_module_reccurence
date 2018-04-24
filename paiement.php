@@ -269,7 +269,7 @@ if (!empty($TRecurrences)) {
 		ORDER BY c.periode
 	';
 	
-	$resql = $db->query($sql);
+	$res = $db->query($sql);
 
 	/*
  	 * Autres charges impayees
@@ -282,7 +282,6 @@ if (!empty($TRecurrences)) {
 	$totalrecu=0;
 	
 	$TPreChecked = array();
-	
 	while($c=$db->fetch_object($res)) {
 		$charge = new ChargeSociales($db);
 		$charge->fetch($c->rowid);
@@ -328,7 +327,7 @@ if (!empty($TRecurrences)) {
 		print '</tr>';
 	}
 	
-	if (empty($Tab)) {
+	if (empty($TPreChecked)) {
 		print "<tr ".$bc[$var].">";
 		print '<td colspan="7" style="text-align: center;">Aucune charge impayées.</td>';
 		print '</tr>';
@@ -338,7 +337,7 @@ if (!empty($TRecurrences)) {
 	
 	print '<br><center>';
 
-	if (!empty($Tab)) {
+	if (!empty($TPreChecked)) {
 		print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
 		print '&nbsp; &nbsp;';
 	}

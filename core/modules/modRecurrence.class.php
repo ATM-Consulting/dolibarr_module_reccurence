@@ -169,10 +169,10 @@ class modRecurrence extends DolibarrModules
 		else
 		{
 			$this->menu[$r] = array(
-				'fk_menu' => 'fk_mainmenu=accountancy,fk_leftmenu=tax',
+				'fk_menu' => 'fk_mainmenu=billing,fk_leftmenu=tax',
 				'type' => 'left',
 				'titre' => 'Récurrence charges sociales',
-				'mainmenu' => 'accountancy',
+				'mainmenu' => 'billing',
 				'leftmenu' => 'tax_social',
 				'url' => '/recurrence/gestion.php',
 				'langs' => 'recurrence@recurrence',
