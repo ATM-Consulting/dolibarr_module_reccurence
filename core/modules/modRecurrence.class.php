@@ -146,24 +146,46 @@ class modRecurrence extends DolibarrModules
 		// Add here entries to declare new menus
 		//
 		// Example to declare a new Top Menu entry and its Left menu entry:
-		$this->menu[$r]=array(
-			'fk_menu'	=> 'fk_mainmenu=accountancy,fk_leftmenu=tax',
-			'type'		=> 'left',
-			'titre'		=> 'Récurrence charges sociales',
-			'mainmenu'	=> 'accountancy',
-			'leftmenu'	=> 'tax_social',
-			'url'		=> '/recurrence/gestion.php',
-			'langs'		=> 'recurrence@recurrence',
-			'position'	=> 100,
-			'enabled'  	=> '1',
-			'perms'	 	=> '$user->rights->recurrence->all->read',
-			'target' 	=> '',
-			'level'		=> 2,
-			'user'	 	=> 0
-		);
-		
-		$r++;
-		
+		if ((float) DOL_VERSION < 7)
+		{
+			$this->menu[$r] = array(
+				'fk_menu' => 'fk_mainmenu=accountancy,fk_leftmenu=tax',
+				'type' => 'left',
+				'titre' => 'Récurrence charges sociales',
+				'mainmenu' => 'accountancy',
+				'leftmenu' => 'tax_social',
+				'url' => '/recurrence/gestion.php',
+				'langs' => 'recurrence@recurrence',
+				'position' => 100,
+				'enabled' => '1',
+				'perms' => '$user->rights->recurrence->all->read',
+				'target' => '',
+				'level' => 2,
+				'user' => 0
+			);
+
+			$r++;
+		}
+		else
+		{
+			$this->menu[$r] = array(
+				'fk_menu' => 'fk_mainmenu=accountancy,fk_leftmenu=tax',
+				'type' => 'left',
+				'titre' => 'Récurrence charges sociales',
+				'mainmenu' => 'accountancy',
+				'leftmenu' => 'tax_social',
+				'url' => '/recurrence/gestion.php',
+				'langs' => 'recurrence@recurrence',
+				'position' => 100,
+				'enabled' => '1',
+				'perms' => '$user->rights->recurrence->all->read',
+				'target' => '',
+				'level' => 2,
+				'user' => 0
+			);
+
+			$r++;
+		}
 	}
 
 	/**
