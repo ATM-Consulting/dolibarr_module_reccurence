@@ -143,7 +143,7 @@ function _liste_charges_sociales( $action, $page, $limit, $offset) {
 	$num = $db->num_rows($res);
 	
 	$param = '&action=' . $action;
-	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $limit + 1);
+	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $num);
 	
 	$form = new TFormCore($db);
 	
