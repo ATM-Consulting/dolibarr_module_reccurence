@@ -235,7 +235,7 @@ class CronRecurrence {
 	}
 	
 	function create_charge_sociale($id_source, $date) {
-		global $user;
+		global $user,$db;
 		
 		// Récupération de la charge sociale initiale
 		$obj = new ChargeSociales($this->db);
@@ -245,17 +245,28 @@ class CronRecurrence {
 			return false;
 		} else {
 			// Création de la nouvelle charge sociale
-			$chargesociale = new ChargeSociales($this->db);
-			$chargesociale->type = $obj->type;
-			$chargesociale->lib = $obj->lib;
-			$chargesociale->date_ech = $date;
-			$chargesociale->periode = $date;
-			$chargesociale->amount = $obj->amount;
-	
-			// TODO WARNING : si une tache cron fait appel à une routine pour créer les charges, il va y avoir un problème d'entité si multicompany et plusieurs charges sur plusieurs entités
-			$id = $chargesociale->create($user);
-					
-			$chargesociale->add_object_linked('chargesociales', $id_source);
+			/*
+			 * CHECK SI UNE CHARGE AVEC MEME LIBELLE EXISTE SUR MEME PERIODE
+			 */
+			$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'chargesociales WHERE libelle LIKE "'.$obj->lib.'" AND periode = "'.$this->db->jdate($date).'"';
+			$resql = $db->query($sql);
+			if(! empty($resql)){
+				if(! $o = $db->fetch_object($resql)){
+					$chargesociale = new ChargeSociales($this->db);
+					$chargesociale->type = $obj->type;
+					$chargesociale->lib = $obj->lib;
+					$chargesociale->date_ech = $date;
+					$chargesociale->periode = $date;
+					$chargesociale->amount = $obj->amount;
+
+					// TODO WARNING : si une tache cron fait appel à une routine pour créer les charges, il va y avoir un problème d'entité si multicompany et plusieurs charges sur plusieurs entités
+					$id = $chargesociale->create($user);
+
+					$chargesociale->add_object_linked('chargesociales', $id_source);
+				}else return false;
+			}else return false;
+			
+			
 						
 			return $id;
 		}
