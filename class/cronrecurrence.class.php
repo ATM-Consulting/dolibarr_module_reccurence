@@ -235,7 +235,7 @@ class CronRecurrence {
 	}
 	
 	function create_charge_sociale($id_source, $date) {
-		global $user,$db;
+		global $user;
 		
 		// Récupération de la charge sociale initiale
 		$obj = new ChargeSociales($this->db);
@@ -249,9 +249,9 @@ class CronRecurrence {
 			 * CHECK SI UNE CHARGE AVEC MEME LIBELLE EXISTE SUR MEME PERIODE
 			 */
 			$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'chargesociales WHERE libelle LIKE "'.$obj->lib.'" AND periode = "'.$this->db->jdate($date).'"';
-			$resql = $db->query($sql);
+			$resql = $this->db->query($sql);
 			if(! empty($resql)){
-				if(! $o = $db->fetch_object($resql)){
+				if(! $o = $this->db->fetch_object($resql)){
 					$chargesociale = new ChargeSociales($this->db);
 					$chargesociale->type = $obj->type;
 					$chargesociale->lib = $obj->lib;
