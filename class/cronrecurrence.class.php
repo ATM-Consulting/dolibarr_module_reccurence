@@ -250,8 +250,10 @@ class CronRecurrence {
 			 */
 			$sql = 'SELECT rowid FROM '.MAIN_DB_PREFIX.'chargesociales WHERE libelle LIKE "'.$obj->lib.'" AND periode = "'.$this->db->jdate($date).'"';
 			$resql = $this->db->query($sql);
-			if(! empty($resql)){
-				if(! $o = $this->db->fetch_object($resql)){
+			if(! empty($resql))
+			{
+				if(! $o = $this->db->fetch_object($resql))
+				{
 					$chargesociale = new ChargeSociales($this->db);
 					$chargesociale->type = $obj->type;
 					$chargesociale->lib = $obj->lib;
@@ -263,11 +265,19 @@ class CronRecurrence {
 					$id = $chargesociale->create($user);
 
 					$chargesociale->add_object_linked('chargesociales', $id_source);
-				}else return false;
-			}else return false;
-			
-			
-						
+				} else
+				{
+					dol_print_error($this->db);
+					return false;
+				}
+			} else
+			{
+				dol_print_error($this->db);
+				return false;
+			}
+
+
+
 			return $id;
 		}
 	}
