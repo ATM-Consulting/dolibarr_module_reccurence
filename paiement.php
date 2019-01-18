@@ -342,7 +342,7 @@ if (!empty($TRecurrences)) {
 		print '&nbsp; &nbsp;';
 	}
 	
-	print '<input type="submit" class="butAction" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?cancel=1" >'.$langs->trans("Cancel").'</a>';
 
 	print '</center>';
 
