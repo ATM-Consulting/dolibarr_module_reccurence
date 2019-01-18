@@ -242,7 +242,7 @@ if (!empty($TRecurrences)) {
 	print '<table class="noborder" width="100%">';
 	print '<tr class="liste_titre">';
 
-	print '<td>Payer</td>';
+	print '<td><input id="checkToggle" type="checkbox"  /> Payer</td>';
 	print '<td>Libellé</td>';
 	print '<td>Date</td>';
 	print '<td>Montant</td>';
@@ -291,10 +291,10 @@ if (!empty($TRecurrences)) {
 		print "<tr ".$bc[$var].">";
 		
 		if (!in_array($c->fk_source, $TPreChecked)) {
-			print '<td><input type="checkbox" name="selected_charges[]" value="' . $charge->id . '" checked /></td>';
+			print '<td><input class="targetCheckToggle" type="checkbox" name="selected_charges[]" value="' . $charge->id . '" checked /></td>';
 			$TPreChecked[] = $c->fk_source;	
 		} else {
-			print '<td><input type="checkbox" name="selected_charges[]" value="' . $charge->id . '" /></td>';
+			print '<td><input class="targetCheckToggle" type="checkbox" name="selected_charges[]" value="' . $charge->id . '" /></td>';
 		}
 		
 		print '<td>' . $charge->getNomUrl(1) . ' - ' . htmlentities($charge->lib) . '</td>';
@@ -338,15 +338,25 @@ if (!empty($TRecurrences)) {
 	print '<br><center>';
 
 	if (!empty($TPreChecked)) {
-		print '<input type="submit" class="button" name="save" value="'.$langs->trans("Save").'">';
+		print '<input type="submit" class="butAction" name="save" value="'.$langs->trans("Save").'">';
 		print '&nbsp; &nbsp;';
 	}
 	
-	print '<input type="submit" class="button" name="cancel" value="'.$langs->trans("Cancel").'">';
+	print '<input type="submit" class="butAction" name="cancel" value="'.$langs->trans("Cancel").'">';
 
 	print '</center>';
 
 	print "</form>\n";
+	
+	print '<script >$( document ).ready(function() { ';
+    print ' $("[name=\'re\']").prop("required",true);  $("#selectpaiementtype").prop("required",true); $("#selectaccountid").prop("required",true); ';
+    print ' $("#checkToggle").click(function() { ';
+    print '     var checkBoxes = $(".targetCheckToggle"); ';
+    print '     checkBoxes.prop("checked", this.checked); ';
+    print ' }); ';
+    print '});</script>';
+	
+	
 }
 
 
