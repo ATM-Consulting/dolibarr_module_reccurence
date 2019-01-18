@@ -227,7 +227,7 @@ function _liste_charges_sociales( $action, $page, $limit, $offset) {
 		echo '</tr>';	
 	}
 
-	if (count($num) <= 0) {
+	if (is_array($num) && count($num) <= 0) {
 		echo '<tr>';
 		if ($action == 'add') {
 			echo '<td style="text-align: center;" colspan="9">Aucune récurrence enregistrée. (<a href="gestion.php?action=add">Créer une récurrence</a>)</td>';
