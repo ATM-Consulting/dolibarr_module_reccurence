@@ -7,3 +7,6 @@ RecurrenceSetup = Configuration du module Recurrence
 RecurrenceAbout = A propos du module Recurrence
 
 RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES=Supprimer les charges sociales déclarée dans le futur sur suppression de la récurrence liée
+
+helpRemoveRecurence=Passe cette ligne dans l'autre onglet et supprime les récurences créées dans le future 
+

@@ -80,7 +80,7 @@ class Recurrence extends SeedObject {
 
 		$recurrence->update($user);
 		
-		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . Recurrence::$TPeriodes[$periode] . ')'; //TODO langs !
+		$message = 'Récurrence de la charge sociale #' . $id_charge . ' enregistrée. (' . Recurrence::$TPeriodes[$periode] . ')'; //TODO langs !
 		setEventMessage($message);
 		
 		$task = new CronRecurrence($db);
@@ -174,7 +174,7 @@ class Recurrence extends SeedObject {
 			
 			$chargesociale->amount = price2num($this->montant);
 			
-			echo $chargesociale->amount.'<br>';//TODO useless ?
+			//echo $chargesociale->amount.'<br>';//TODO useless ?
 			
 			$chargesociale->update($user);
 		}

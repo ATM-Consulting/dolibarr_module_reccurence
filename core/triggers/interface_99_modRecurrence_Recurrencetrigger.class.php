@@ -113,6 +113,7 @@ class InterfaceRecurrencetrigger
      */
     public function run_trigger($action, $object, $user, $langs, $conf)
     {
+        global $conf;
         // Put here code you want to execute when a Dolibarr business events occurs.
         // Data and type of action are stored into $object and $action
         // Users
@@ -120,7 +121,28 @@ class InterfaceRecurrencetrigger
             dol_syslog(
                 "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
             );
-        } elseif ($action == 'USER_UPDATE_SESSION') {
+        } elseif ($action == 'SOCIALCHARGES_MODIFY') {
+            dol_syslog(
+                "Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $object->id
+                );
+            if(!empty($conf->global->RECURRENCE_USE_AUTO_UPDATE))
+            {
+                dol_include_once('abricot/includes/class/class.seedobject.php');
+                dol_include_once('recurrence/class/recurrence.class.php');
+                
+                $recurrence = Recurrence::get_recurrence($object->id);
+                if(!empty($recurrence->id)){
+                    
+                    Recurrence::del( $object->id); // on supprime pour recreer
+                    
+                    //$object->date_ech, $object->period
+                    $date_fin_rec = dol_print_date($recurrence->date_fin,"%d/%m/%Y"); // Format mm/dd/yyy
+                    Recurrence::updateReccurence( $recurrence->fk_chargesociale, $recurrence->periode, $date_fin_rec, $recurrence->nb_previsionnel, $object->amount);
+                }
+            }
+            
+        }
+        elseif ($action == 'USER_UPDATE_SESSION') {
             // Warning: To increase performances, this action is triggered only if
             // constant MAIN_ACTIVATE_UPDATESESSIONTRIGGER is set to 1.
             dol_syslog(
