@@ -10,7 +10,7 @@ $action = __get('action', 'view');
 $page   = __get('page', 0);
 if ($page < 0) $page = 0;
 
-$limit  = $conf->liste_limit;
+$limit  = GETPOST('limit') ? GETPOST('limit') : $conf->liste_limit;
 $offset = $limit * $page;
 
 if (!$user->rights->recurrence->all->read) {
@@ -28,8 +28,6 @@ print dol_get_fiche_head(array(
 	array(dol_buildpath('/recurrence/gestion.php?action=view', 1), 'Liste des récurrences', 'view'),
 	array(dol_buildpath('/recurrence/gestion.php?action=add', 1), 'Enregistrer une tâche récurrente', 'add')
 )  , $action, '');
-
-echo '<form method="POST" action="paiement.php">'; // Formulaire pour la gestion des paiements
 
 _liste_charges_sociales( $action, $page, $limit, $offset);
 
@@ -137,14 +135,27 @@ function _liste_charges_sociales( $action, $page, $limit, $offset) {
 
 	$sql .= 'GROUP BY cs.rowid, cs.fk_type, cs.amount, cs.date_ech, cs.libelle, cs.paye, cs.periode, c.libelle ';
 	$sql .= 'ORDER BY cs.periode DESC ';
+
+    if (empty($conf->global->MAIN_DISABLE_FULL_SCANLIST))
+    {
+        $result = $db->query($sql);
+        $nbtotalofrecords = $db->num_rows($result);
+    }
+
 	$sql .= 'LIMIT ' . $offset . ', ' . ($limit + 1);
-	
+
 	$res = $db->query($sql);
 	$num = $db->num_rows($res);
-	
+    if(empty($nbtotalofrecords)) $nbtotalofrecords = $num;
+
+    echo '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">'; // Formulaire pour la gestion des paiements
+
 	$param = '&action=' . $action;
-	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $num);
-	
+	print_barre_liste('Liste', $page, $_SERVER["PHP_SELF"], $param, '', '', '', $num, $nbtotalofrecords, 'title_generic.png', 0, '', '', $limit);
+
+	print '</form>';
+
+    echo '<form method="POST" action="paiement.php">'; // Formulaire pour la gestion des paiements
 	$form = new TFormCore($db);
 	
 	echo '<table class="noborder" width="100%">';
