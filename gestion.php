@@ -116,7 +116,7 @@ llxfooter();
  * Liste des charges sociales
  */
 function _liste_charges_sociales( $action, $page, $limit, $offset) {
-	global $conf, $db, $user, $bc;
+	global $conf, $db, $user, $bc, $langs;
 	
 	$charge_sociale = new ChargeSociales($db);
 	$sql = "
@@ -217,7 +217,7 @@ function _liste_charges_sociales( $action, $page, $limit, $offset) {
 			} else {
 				echo '<td>
 					<button class="update-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Modifier</button>
-					<button class="delete-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Supprimer</button>
+					<button class="delete-recurrence" title="'.$langs->trans('helpRemoveRecurence').'" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">'.$langs->trans('Remove').'</button>
 				</td>';
 			}
 		} else {

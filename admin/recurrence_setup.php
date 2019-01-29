@@ -95,6 +95,13 @@ dol_fiche_head(
     "recurrence@recurrence"
 );
 
+/**** CONFIGURATIONS CACHEES ****
+ * RECURRENCE_USE_AUTO_UPDATE -> recalcule les récurence futures sur modification de la charge témoins (dolibar v6 min)
+ * 
+ */
+
+
+
 // Setup page goes here
 $form=new Form($db);
 $var=false;

@@ -56,8 +56,10 @@ class Recurrence extends SeedObject {
 	 * Fonction permettant d'ajouter ou modifier une récurrence selon si elle existe ou non
 	 */
 	static function updateReccurence($id_charge, $periode, $date_fin_rec, $nb_previsionnel, $montant) {
-	    global $db,$conf,$user;
+	    global $db,$conf,$user,$langs;
 		
+	    $langs->load("recurrence@recurrence");
+	    
 		if (!empty($date_fin_rec) && !preg_match('/([0-9]{2}[\/-]?){2}([0-9]{4})/', $date_fin_rec))
 			return false;
 
@@ -80,7 +82,7 @@ class Recurrence extends SeedObject {
 
 		$recurrence->update($user);
 		
-		$message = 'Récurrence de la charge sociale ' . $id_charge . ' enregistrée. (' . Recurrence::$TPeriodes[$periode] . ')'; //TODO langs !
+		$message = $langs->trans('EventMsgRecSave', $id_charge, Recurrence::$TPeriodes[$periode] ); // 'Récurrence de la charge sociale #' . $id_charge . ' enregistrée. (' . Recurrence::$TPeriodes[$periode] . ')'; //TODO langs !
 		setEventMessage($message);
 		
 		$task = new CronRecurrence($db);
@@ -174,7 +176,7 @@ class Recurrence extends SeedObject {
 			
 			$chargesociale->amount = price2num($this->montant);
 			
-			echo $chargesociale->amount.'<br>';//TODO useless ?
+			//echo $chargesociale->amount.'<br>';//TODO useless ?
 			
 			$chargesociale->update($user);
 		}
