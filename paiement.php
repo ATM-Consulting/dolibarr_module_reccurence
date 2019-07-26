@@ -269,7 +269,7 @@ if (!empty($TRecurrences)) {
 		AND c.paye = 0
 		ORDER BY c.periode
 	';
-	
+	var_dump($sql);
 	$res = $db->query($sql);
 
 	/*
@@ -317,7 +317,7 @@ if (!empty($TRecurrences)) {
 		print '<td>' . price($charge->amount - $sumpaid, 2) . '</td>';
 		
 		$namef = "amount_".$charge->id;
-		print '<td><input type="text" size="8" name="'.$namef.'" value="' . $charge->amount . '"></td>';
+		print '<td><input type="text" size="8" name="'.$namef.'" value="' . price($charge->amount) . '"></td>';
 		
 		/*
 		print '<td align="right">'.price($sumpaid)."</td>";
