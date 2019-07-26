@@ -155,7 +155,8 @@ if ($action == 'add_payment')
 
 				if (! $error) {
 	                $db->commit();
-	                $loc = DOL_URL_ROOT.'/compta/sociales/index.php?leftmenu=tax_social';
+	                if((float) DOL_VERSION < 9.0) $loc = DOL_URL_ROOT.'/compta/sociales/index.php?leftmenu=tax_social';
+	                else $loc = DOL_URL_ROOT.'/compta/sociales/list.php?leftmenu=tax_social';
 	                header('Location: '.$loc);
 	                exit;
 	            } else {
