@@ -269,7 +269,6 @@ if (!empty($TRecurrences)) {
 		AND c.paye = 0
 		ORDER BY c.periode
 	';
-	var_dump($sql);
 	$res = $db->query($sql);
 
 	/*
