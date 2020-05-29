@@ -160,10 +160,10 @@ class Recurrence extends SeedObject {
 		return $Tab;
 	}
 	
-	function update(User &$user){
+	function update(User &$user, $notrigger = false){
 		global $db;
 		
-		parent::update($user);
+		parent::update($user, $notrigger);
 		
 		$TCharges = $this->get_prochaines_charges($this->fk_chargesociale,date('Y-m-d'));
 
