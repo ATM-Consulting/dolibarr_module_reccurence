@@ -49,7 +49,7 @@ $action = GETPOST('action', 'alpha');
 if (preg_match('/set_(.*)/',$action,$reg))
 {
 	$code=$reg[1];
-	if (dolibarr_set_const($db, $code, GETPOST($code), 'chaine', 0, '', $conf->entity) > 0)
+	if (dolibarr_set_const($db, $code, GETPOST($code,'alpha'), 'chaine', 0, '', $conf->entity) > 0)
 	{
 		header("Location: ".$_SERVER["PHP_SELF"]);
 		exit;
@@ -59,7 +59,7 @@ if (preg_match('/set_(.*)/',$action,$reg))
 		dol_print_error($db);
 	}
 }
-	
+
 if (preg_match('/del_(.*)/',$action,$reg))
 {
 	$code=$reg[1];
@@ -97,7 +97,7 @@ dol_fiche_head(
 
 /**** CONFIGURATIONS CACHEES ****
  * RECURRENCE_USE_AUTO_UPDATE -> recalcule les récurence futures sur modification de la charge témoins (dolibar v6 min)
- * 
+ *
  */
 
 
