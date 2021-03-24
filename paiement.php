@@ -54,7 +54,7 @@ if (!empty($cancel)) {
 if ($action == 'add_payment')
 {
 	$error=0;
-
+	
 	if ($_POST["cancel"])
 	{
 		$loc = DOL_URL_ROOT.'/compta/sociales/charges.php?id='.$chid;
@@ -69,13 +69,13 @@ if ($action == 'add_payment')
 		$mesg = $langs->trans("ErrorFieldRequired",$langs->transnoentities("PaymentMode"));
 		$error++;
 	}
-
+	
 	if ($datepaye == '')
 	{
 		$mesg = $langs->trans("ErrorFieldRequired",$langs->transnoentities("Date"));
 		$error++;
 	}
-
+	
     if (! empty($conf->banque->enabled) && ! $_POST["accountid"] > 0)
     {
         $mesg = $langs->trans("ErrorFieldRequired",$langs->transnoentities("AccountToCredit"));
@@ -95,7 +95,7 @@ if ($action == 'add_payment')
 				$amounts[$other_chid] = price2num($_POST[$key]);
 			}
 		}
-
+		
 		//var_dump($amounts, $_REQUEST); exit;
         if (count($amounts) <= 0)
         {
@@ -106,15 +106,15 @@ if ($action == 'add_payment')
         if (! $error)
         {
     		$db->begin();
-
+			
 			$TSelected_charges = GETPOST('selected_charges');
     		if (!empty($TSelected_charges)) {
     			foreach ($TSelected_charges as $id) {
     				$charge = new ChargeSociales($db);
 					$charge->fetch($id);
-
+					
     				$amount = array();
-
+					
 					// Récupére uniquement le paiement concernant la charge
     				$amount[$id] = $amounts[$id];
 
@@ -125,8 +125,13 @@ if ($action == 'add_payment')
 		    		$paiement->amounts      = $amount;   // Tableau de montant
 		    		$paiement->paiementtype = $_POST["paiementtype"];
 		    		$paiement->num_payment = $_POST["num_payment"];
-		    		$paiement->note         = $_POST["note"];
+		    		if(intval(DOL_VERSION) < 13){
+						$paiement->num_paiement = $_POST["num_payment"];
+					}
 
+		    		$paiement->note         = $_POST["note"]; // $paiement->note is deprecated
+		    		$paiement->note_private = $_POST["note"];
+		
 		    		if (! $error)
 		    		{
 		    		    $paymentid = $paiement->create($user);
@@ -136,15 +141,15 @@ if ($action == 'add_payment')
 		                    $error++;
 		                }
 		    		}
-
+		
 		            if (! $error)
 		            {
 		                $result=$paiement->addPaymentToBank($user,'payment_sc','(SocialContributionPayment)',$_POST['accountid'],'','');
-
+						
 						if ($charge->amount == $amount[$id]) {
 							$charge->set_paid($user);
 						}
-
+						
 		                if (! $result > 0)
 		                {
 		                    $errmsg=$paiement->error;
@@ -170,7 +175,7 @@ if ($action == 'add_payment')
 } else if (empty($TRecurrences)) {
 	$message = 'Veuillez sélectionner au moins une récurrence à payer.';
 	setEventMessage($message, 'errors');
-
+			
 	header('Location: gestion.php');
 	exit;
 }
@@ -187,26 +192,26 @@ $form=new Form($db);
 // Formulaire de creation d'un paiement de charge
 if (!empty($TRecurrences)) {
 	$recurrences = implode(',', $TRecurrences); // Récupération des récurrences pour requête
-
+	
 	print_fiche_titre($langs->trans("DoPayment"));
 	print "<br>\n";
 
 	if ($mesg) {
 		print "<div class=\"error\">$mesg</div>";
 	}
-
+	
 	print '<form name="add_payment" action="'.$_SERVER['PHP_SELF'].'" method="post">';
 	print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
 	print '<input type="hidden" name="id" value="'.$charge_recurrente->id.'">';
 	print '<input type="hidden" name="chid" value="'.$charge_recurrente->id.'">';
 	print '<input type="hidden" name="action" value="add_payment">';
-
+	
 	print '<table cellspacing="0" class="border" width="100%" cellpadding="2">';
 
 	print '<tr class="liste_titre">';
 	print '<td colspan="4">'.$langs->trans("Payment").'</td>';
 	print '</tr>';
-
+	
 	print '<tr><td class="fieldrequired">'.$langs->trans("Date").'</td><td colspan="3">';
 	$datepaye = dol_mktime(12, 0, 0, $_POST["remonth"], $_POST["reday"], $_POST["reyear"]);
 	$datepayment=empty($conf->global->MAIN_AUTOFILL_DATE)?(empty($_POST["remonth"])?-1:$datepaye):0;
@@ -244,7 +249,7 @@ if (!empty($TRecurrences)) {
 	print '</table>';
 
 	print '<br>';
-
+	
 	print '<table class="noborder" width="100%">';
 	print '<tr class="liste_titre">';
 
@@ -262,7 +267,7 @@ if (!empty($TRecurrences)) {
 	$charge_recurrente->fetch($id_recurrence);
 
 	$price = $charge_recurrente->amount;
-
+	
 	// Récupération des charges créées à partir de celle là et non payée
 	$sql = '
 		SELECT c.rowid, e.fk_source
@@ -285,7 +290,7 @@ if (!empty($TRecurrences)) {
 	$var=True;
 	$total=0;
 	$totalrecu=0;
-
+	
 	$TPreChecked = array();
 	while($c=$db->fetch_object($res)) {
 		$charge = new ChargeSociales($db);
@@ -294,65 +299,65 @@ if (!empty($TRecurrences)) {
 		$var=!$var;
 
 		print "<tr ".$bc[$var].">";
-
+		
 		if (!in_array($c->fk_source, $TPreChecked)) {
 			print '<td><input class="targetCheckToggle" type="checkbox" name="selected_charges[]" value="' . $charge->id . '" checked /></td>';
-			$TPreChecked[] = $c->fk_source;
+			$TPreChecked[] = $c->fk_source;	
 		} else {
 			print '<td><input class="targetCheckToggle" type="checkbox" name="selected_charges[]" value="' . $charge->id . '" /></td>';
 		}
-
+		
 		print '<td>' . $charge->getNomUrl(1) . ' - ' . htmlentities($charge->lib) . '</td>';
 		print '<td>' . dol_print_date($charge->periode, 'day') . '</td>';
 		print '<td>' . price($charge->amount, 2) . '</td>';
-
+		
 		$sql = "SELECT sum(p.amount) as total";
 		$sql.= "FROM ".MAIN_DB_PREFIX."paiementcharge as p";
 		$sql.= "WHERE p.fk_charge = ".$charge->id;
 		$resql = $db->query($sql);
-
+		
 		if ($resql) {
 			$obj=$db->fetch_object($resql);
 			$sumpaid = $obj->total;
 			$db->free();
 		}
-
+	
 		print '<td>' . price($sumpaid, 2) . '</td>';
 		print '<td>' . price($charge->amount - $sumpaid, 2) . '</td>';
-
+		
 		$namef = "amount_".$charge->id;
 		print '<td><input type="text" size="8" name="'.$namef.'" value="' . price($charge->amount) . '"></td>';
-
+		
 		/*
 		print '<td align="right">'.price($sumpaid)."</td>";
 
 		print '<td align="right">'.price($objp->amount - $sumpaid)."</td>";
 		*/
-
+		
 		print '</tr>';
 	}
-
+	
 	if (empty($TPreChecked)) {
 		print "<tr ".$bc[$var].">";
 		print '<td colspan="7" style="text-align: center;">Aucune charge impayées.</td>';
 		print '</tr>';
 	}
-
+	
 	print "</table>";
-
+	
 	print '<br><center>';
 
 	if (!empty($TPreChecked)) {
 		print '<input type="submit" class="butAction" name="save" value="'.$langs->trans("Save").'">';
 		print '&nbsp; &nbsp;';
 	}
-
+	
 	print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?cancel=1" >'.$langs->trans("Cancel").'</a>';
 
 	print '</center>';
 
 	print "</form>\n";
-
+	
 	print '<script >$( document ).ready(function() { ';
     print ' $("[name=\'re\']").prop("required",true);  $("#selectpaiementtype").prop("required",true); $("#selectaccountid").prop("required",true); ';
     print ' $("#checkToggle").click(function() { ';
@@ -360,8 +365,8 @@ if (!empty($TRecurrences)) {
     print '     checkBoxes.prop("checked", this.checked); ';
     print ' }); ';
     print '});</script>';
-
-
+	
+	
 }
 
 
