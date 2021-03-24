@@ -124,8 +124,13 @@ if ($action == 'add_payment')
 		    		$paiement->datepaye     = $datepaye;
 		    		$paiement->amounts      = $amount;   // Tableau de montant
 		    		$paiement->paiementtype = $_POST["paiementtype"];
-		    		$paiement->num_paiement = $_POST["num_paiement"];
-		    		$paiement->note         = $_POST["note"];
+		    		$paiement->num_payment = $_POST["num_payment"];
+		    		if(intval(DOL_VERSION) < 13){
+						$paiement->num_paiement = $_POST["num_payment"];
+					}
+
+		    		$paiement->note         = $_POST["note"]; // $paiement->note is deprecated
+		    		$paiement->note_private = $_POST["note"];
 		
 		    		if (! $error)
 		    		{
@@ -230,6 +235,7 @@ if (!empty($TRecurrences)) {
 	print ' <em>('.$langs->trans("ChequeOrTransferNumber").')</em>';
 	print '</td>';
 	print '<td colspan="3"><input name="num_paiement" type="text" value="'.GETPOST('num_paiement').'"></td></tr>'."\n";
+
 
 	print '<tr>';
 	print '<td valign="top">'.$langs->trans("Comments").'</td>';
