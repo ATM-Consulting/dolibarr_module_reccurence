@@ -234,11 +234,7 @@ if (!empty($TRecurrences)) {
 	print '<tr><td>'.$langs->trans('Numero');
 	print ' <em>('.$langs->trans("ChequeOrTransferNumber").')</em>';
 	print '</td>';
-	if (DOL_VERSION < 13.0){
-		print '<td colspan="3"><input name="num_paiement" type="text" value="'.GETPOST('num_paiement').'"></td>';
-	}else{
-		print '<td colspan="3"><input name="num_payment" type="text" value="'.GETPOST('num_payment','alpha').'"></td></tr>'."\n";
-	}
+	print '<td colspan="3"><input name="num_paiement" type="text" value="'.GETPOST('num_paiement').'"></td></tr>'."\n";
 
 
 	print '<tr>';
