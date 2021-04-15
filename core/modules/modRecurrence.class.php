@@ -58,7 +58,7 @@ class modRecurrence extends DolibarrModules
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Gestion des récurrences des charges sociales";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
-		$this->version = '1.2.0';
+		$this->version = '1.2.1';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_'.strtoupper($this->name);
 		// Where to store the module in setup page (0=common,1=interface,2=others,3=very specific)
@@ -131,7 +131,7 @@ class modRecurrence extends DolibarrModules
 		// Permissions
 		$this->rights = array();		// Permission array used by this module
 		$r=0;
-		
+
 		$this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
 		$this->rights[$r][1] = 'Visualiser les charges sociales';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
@@ -199,13 +199,13 @@ class modRecurrence extends DolibarrModules
 	function init($options='')
 	{
 		global $user;
-		
+
 		$sql = array();
 
         define('INC_FROM_DOLIBARR', true);
         dol_include_once('/recurrence/config.php');
 		dol_include_once('/recurrence/script/create-maj-base.php');
-		
+
 		$TValues = array(
 			'label' => 'Mise à jour récurrence',
 			'jobtype' => 'method',
@@ -219,7 +219,7 @@ class modRecurrence extends DolibarrModules
 			'params' => '',
 			'datestart' => time()
 		);
-		
+
 		$req = "
 			SELECT rowid
 			FROM " . MAIN_DB_PREFIX . "cronjob
@@ -228,19 +228,19 @@ class modRecurrence extends DolibarrModules
 			AND objectname = '" . $TValues['objectname'] . "'
 			AND methodename = '" . $TValues['methodename'] . "'
 		";
-		
+
 		$res = $this->db->query($req);
 		$job = $this->db->fetch_object($res);
-		
+
 		if (empty($job->rowid)) {
 			$cronTask = new Cronjob($this->db);
 			foreach ($TValues as $key => $value) {
 				$cronTask->{$key} = $value;
 			}
-			
+
 			$cronTask->create($user);
 		}
-		
+
 		return $this->_init($sql, $options);
 	}
 
