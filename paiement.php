@@ -348,7 +348,7 @@ if (!empty($TRecurrences)) {
 		print '&nbsp; &nbsp;';
 	}
 
-	print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?cancel=1" >'.$langs->trans("Cancel").'</a>';
+	print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?cancel=1&token='.$newToken.'" >'.$langs->trans("Cancel").'</a>';
 
 	print '</center>';
 
