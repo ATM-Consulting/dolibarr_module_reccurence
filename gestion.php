@@ -255,23 +255,26 @@ function _liste_charges_sociales( $action, $page, $limit, $offset) {
 }
 
 function _print_head_tab_charges_sociales($action) {
+
+	$newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
+	$param="&token=".$newToken;
 	echo '<thead>';
 		echo '<tr class="liste_titre">';
 		echo '<th class="liste_titre"></th>';
-		print_liste_field_titre('Ref', $_SERVER['PHP_SELF'], 'id');
-		print_liste_field_titre('Libellé', $_SERVER['PHP_SELF'], 'libelle');
-		print_liste_field_titre('Type', $_SERVER['PHP_SELF'], 'type_lib');
-		print_liste_field_titre('Date', $_SERVER['PHP_SELF'], 'periode');
+		print_liste_field_titre('Ref', $_SERVER['PHP_SELF'], 'id',"",$param);
+		print_liste_field_titre('Libellé', $_SERVER['PHP_SELF'], 'libelle',"",$param);
+		print_liste_field_titre('Type', $_SERVER['PHP_SELF'], 'type_lib',"",$param);
+		print_liste_field_titre('Date', $_SERVER['PHP_SELF'], 'periode',"",$param);
 
 		if ($action != 'add') {
-			print_liste_field_titre('Prochaine charge à payer', $_SERVER['PHP_SELF'], 'periode');
+			print_liste_field_titre('Prochaine charge à payer', $_SERVER['PHP_SELF'], 'periode',"",$param);
 		}
 
-		print_liste_field_titre('Montant', $_SERVER['PHP_SELF'], 'amount');
-		print_liste_field_titre('Récurrence', $_SERVER['PHP_SELF'], 'fk_recurrence');
-		print_liste_field_titre('Date de fin', $_SERVER['PHP_SELF'], 'fk_recurrence');
-		print_liste_field_titre('Nb. prévisionnel', $_SERVER['PHP_SELF'], 'fk_recurrence');
-		print_liste_field_titre('Action', $_SERVER['PHP_SELF'], 'fk_recurrence');
+		print_liste_field_titre('Montant', $_SERVER['PHP_SELF'], 'amount',"",$param);
+		print_liste_field_titre('Récurrence', $_SERVER['PHP_SELF'], 'fk_recurrence',"",$param);
+		print_liste_field_titre('Date de fin', $_SERVER['PHP_SELF'], 'fk_recurrence',"",$param);
+		print_liste_field_titre('Nb. prévisionnel', $_SERVER['PHP_SELF'], 'fk_recurrence',"",$param);
+		print_liste_field_titre('Action', $_SERVER['PHP_SELF'], 'fk_recurrence',"",$param);
 		echo '</tr>';
 	echo '</thead>';
 }
