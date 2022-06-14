@@ -26,8 +26,8 @@ llxHeader('', 'Récurrence des charges sociales');
 print_fiche_titre('Récurrence des charges sociales', '', 'report.png@report');
 
 print dol_get_fiche_head(array(
-	array(dol_buildpath('/recurrence/gestion.php?action=view', 1), 'Liste des récurrences', 'view'),
-	array(dol_buildpath('/recurrence/gestion.php?action=add', 1), 'Enregistrer une tâche récurrente', 'add')
+	array(dol_buildpath('/recurrence/gestion.php?action=view&token='.$newToken, 1), 'Liste des récurrences', 'view'),
+	array(dol_buildpath('/recurrence/gestion.php?action=add&token='.$newToken, 1), 'Enregistrer une tâche récurrente', 'add')
 )  , $action, '');
 
 _liste_charges_sociales( $action, $page, $limit, $offset);
@@ -36,7 +36,7 @@ if ($user->rights->tax->charges->creer) {
 	if ($action == 'add') {
 		if ($user->rights->tax->charges->creer) {
 			echo '<div class="tabsAction">';
-$url = (float)DOL_VERSION>=5 ? '/compta/sociales/card.php?leftmenu=tax_social&action=create' : '/compta/sociales/charges.php?leftmenu=tax_social&action=create';
+$url = (float)DOL_VERSION>=5 ? '/compta/sociales/card.php?leftmenu=tax_social&action=create&token='.$newToken : '/compta/sociales/charges.php?leftmenu=tax_social&action=create&token='.$newToken;
 
 			$urlPage = 'charges.php';
 			if(version_compare(DOL_VERSION, '5.0', '>=')) {
@@ -59,7 +59,7 @@ $url = (float)DOL_VERSION>=5 ? '/compta/sociales/card.php?leftmenu=tax_social&ac
 				<input type="submit" class="butAction" value="Payer les récurrences sélectionnées" />
 			</div>';
 
-			echo '<div class="inline-block divButAction"><a class="butAction" href="gestion.php?action=add">Ajouter une récurrence</a></div>';
+			echo '<div class="inline-block divButAction"><a class="butAction" href="gestion.php?action=add&token='.$newToken.'">Ajouter une récurrence</a></div>';
 		echo '</div>';
 	}
 }
