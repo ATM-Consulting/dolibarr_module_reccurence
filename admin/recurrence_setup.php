@@ -40,6 +40,8 @@ if (! $user->admin) {
     accessforbidden();
 }
 
+$newToken = function_exists('newToken') ? newToken() : $_SESSION['newtoken'];
+
 // Parameters
 $action = GETPOST('action', 'alpha');
 
@@ -59,7 +61,7 @@ if (preg_match('/set_(.*)/',$action,$reg))
 		dol_print_error($db);
 	}
 }
-	
+
 if (preg_match('/del_(.*)/',$action,$reg))
 {
 	$code=$reg[1];
@@ -97,7 +99,7 @@ dol_fiche_head(
 
 /**** CONFIGURATIONS CACHEES ****
  * RECURRENCE_USE_AUTO_UPDATE -> recalcule les récurence futures sur modification de la charge témoins (dolibar v6 min)
- * 
+ *
  */
 
 
@@ -119,7 +121,7 @@ print '<td>'.$langs->trans("RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES").'</td>';
 print '<td align="center" width="20">&nbsp;</td>';
 print '<td align="right" width="300">';
 print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
-print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+print '<input type="hidden" name="token" value="'.$newToken.'">';
 print '<input type="hidden" name="action" value="set_RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES">';
 print $form->selectyesno("RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES",$conf->global->RECURRENCE_DELETE_FUTUR_SOCIAL_TAXES,1);
 print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
