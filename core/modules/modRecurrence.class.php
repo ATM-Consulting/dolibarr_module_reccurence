@@ -88,7 +88,7 @@ class modRecurrence extends DolibarrModules
 	 	//							'js' => array('/recurrence/js/recurrence.js'),          // Set this to relative path of js file if module must load a js on all pages
 		//							'hooks' => array('hookcontext1','hookcontext2')  	// Set here all hooks context managed by module
 		//							'dir' => array('output' => 'othermodulename'),      // To force the default directories names
-		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@recurrence')) // Set here all workflow context managed by module
+		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'isModEnabled('module1') && isModEnabled('module2')', 'picto'=>'yourpicto@recurrence')) // Set here all workflow context managed by module
 		//                        );
 		$this->module_parts = array('triggers' => 1);
 
@@ -118,7 +118,7 @@ class modRecurrence extends DolibarrModules
         $this->tabs = array();
 
         // Dictionaries
-	    if (!isset($conf->recurrence->enabled))
+	    if (!isModEnabled('recurrence'))
         {
         	$conf->recurrence=new stdClass();
         	$conf->recurrence->enabled=0;
@@ -138,8 +138,8 @@ class modRecurrence extends DolibarrModules
 		$this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
 		$this->rights[$r][1] = 'Visualiser les charges sociales';	// Permission label
 		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
-		$this->rights[$r][4] = 'all';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		$this->rights[$r][5] = 'read';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][4] = 'all';				// In php code, permission will be checked by test if ($user->hasRight('permkey', 'level1', 'level2'))
+		$this->rights[$r][5] = 'read';				// In php code, permission will be checked by test if ($user->hasRight('permkey', 'level1', 'level2'))
 		$r++;
 
 		// Main menu entries
@@ -161,7 +161,7 @@ class modRecurrence extends DolibarrModules
 				'langs' => 'recurrence@recurrence',
 				'position' => 100,
 				'enabled' => '1',
-				'perms' => '$user->rights->recurrence->all->read',
+				'perms' => '$user->hasRight('recurrence', 'all', 'read')',
 				'target' => '',
 				'level' => 2,
 				'user' => 0
@@ -181,7 +181,7 @@ class modRecurrence extends DolibarrModules
 				'langs' => 'recurrence@recurrence',
 				'position' => 100,
 				'enabled' => '1',
-				'perms' => '$user->rights->recurrence->all->read',
+				'perms' => '$user->hasRight('recurrence', 'all', 'read')',
 				'target' => '',
 				'level' => 2,
 				'user' => 0

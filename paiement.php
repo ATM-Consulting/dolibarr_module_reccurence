@@ -76,7 +76,7 @@ if ($action == 'add_payment')
 		$error++;
 	}
 
-    if (! empty($conf->banque->enabled) && ! $_POST["accountid"] > 0)
+    if (isModEnabled('banque') && ! $_POST["accountid"] > 0)
     {
         $mesg = $langs->trans("ErrorFieldRequired",$langs->transnoentities("AccountToCredit"));
         $error++;
