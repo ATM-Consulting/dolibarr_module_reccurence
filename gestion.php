@@ -13,7 +13,7 @@ if ($page < 0) $page = 0;
 $limit  = GETPOST('limit') ? GETPOST('limit') : $conf->liste_limit;
 $offset = $limit * $page;
 
-if (!$user->rights->recurrence->all->read) {
+if (!$user->hasRight('recurrence', 'all', 'read')) {
 	accessforbidden();
 }
 
@@ -32,9 +32,9 @@ print dol_get_fiche_head(array(
 
 _liste_charges_sociales( $action, $page, $limit, $offset);
 
-if ($user->rights->tax->charges->creer) {
+if ($user->hasRight('tax', 'charges', 'creer')) {
 	if ($action == 'add') {
-		if ($user->rights->tax->charges->creer) {
+		if ($user->hasRight('tax', 'charges', 'creer')) {
 			echo '<div class="tabsAction">';
 $url = (float)DOL_VERSION>=5 ? '/compta/sociales/card.php?leftmenu=tax_social&action=create&token='.$newToken : '/compta/sociales/charges.php?leftmenu=tax_social&action=create&token='.$newToken;
 
@@ -224,7 +224,7 @@ function _liste_charges_sociales( $action, $page, $limit, $offset) {
 			echo '<td><input type="text" id="nb_prev_rec_' . $obj->id . '" name="nb_previsionnel_rec" value="' . $recurrence->nb_previsionnel . '"/></td>';
 		}
 
-		if ($user->rights->tax->charges->creer) {
+		if ($user->hasRight('tax', 'charges', 'creer')) {
 			if ($action == 'add') {
 				echo '<td><button class="update-recurrence" data-chargesociale="' . $obj->id . '" style="margin: 2px 4px; padding: 2px;">Ajouter</button></td>';
 			} else {
